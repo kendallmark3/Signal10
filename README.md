@@ -12,13 +12,19 @@ You enter a topic or learning goal. Signal10 returns up to 10 real YouTube video
 
 Requires Node 20.12 or later. Run `npm install` once.
 
-The Top 10, the learning path and the video player need no API key. Architect View needs an Anthropic API key on the server: put it in a file named `.env` next to `server.js` (the file is git-ignored), or export it in the shell before starting.
+Settings live in a file named `.env` next to `server.js` (git-ignored), or in the real environment:
 
 ```text
+SIGNAL10_USERNAME=your-username
+SIGNAL10_PASSWORD=your-password
 ANTHROPIC_API_KEY=your-key-here
 ```
 
-Without a key, Architect View shows a message saying it is not set up and everything else works as normal.
+- **`SIGNAL10_USERNAME` and `SIGNAL10_PASSWORD` are required.** The whole site sits behind a sign-in screen, and the server refuses to start without both. To change them, edit the values and restart; everyone signed in under the old ones is signed out.
+- **`ANTHROPIC_API_KEY` is optional.** Without it, Architect View says it is not set up and everything else works.
+- **`HOST` and `PORT` are optional.** The server listens on `127.0.0.1:4310` unless told otherwise; a deployment sets `HOST=0.0.0.0`.
+
+When deploying, serve the site over HTTPS (for example behind a load balancer or CloudFront). Over plain HTTP the password and session cookie travel unencrypted.
 
 ```bash
 npm start        # serves http://localhost:4310 (set PORT to change it)
@@ -90,6 +96,7 @@ Each result shows its score, the five signal bars, a one-sentence reason, and wh
 ## Known limitations
 
 - **Architect View has not watched the videos.** Claude sees only each video's rank, title, channel, length and age, and adds its own knowledge of the topic. Its concepts, implications and risks can be out of date for a new technology, and its guesses about what a video covers can be wrong. Every video it names is one of Signal10's Top 10; it cannot add others.
+- **Sign-in is one shared username and password.** There are no accounts, no password reset, and the password is stored as plain text in the server's environment. Five wrong attempts in a row lock sign-in for a minute for everyone, including the owner.
 - **Architect View costs money and takes time.** Each new topic makes one call to Claude Opus 5.5 on your API key and can take up to a minute. The result is kept in memory for 15 minutes, so reopening it is free.
 - **No YouTube API key means an unofficial data source.** Results come from the same public endpoints youtube.com uses. YouTube can change or rate-limit them without notice, and a hosted deployment should move to the YouTube Data API.
 - **No engagement signal.** Likes and comment counts are not in search results, so momentum stands in for audience response.
@@ -150,10 +157,12 @@ Signal10 follows a progressive-intent approach: get a real V1 running, learn fro
 | [intents/](intents/) | One intent per feature built after V1 |
 | [server.js](server.js) | HTTP server: the page, `/api/top10` and `/api/architect` |
 | [src/architect.js](src/architect.js) | Architect View: the one Claude call and the checks on its reply |
+| [src/auth.js](src/auth.js) | Sign-in: credential check, signed session, lockout |
 | [src/youtube.js](src/youtube.js) | Fetches and parses real video metadata from YouTube |
 | [src/rank.js](src/rank.js) | Scoring, de-duplication, and explanations |
 | [src/learning-path.js](src/learning-path.js) | Title-cue learning-path staging and explanations |
 | [public/index.html](public/index.html) | The single-page interface |
+| [public/login.html](public/login.html) | The sign-in screen |
 | [test/](test/) | Tests for ranking, parsing, and learning paths |
 | [DESIGN.md](DESIGN.md) | Design notes for the Intent-Driven Starter plugin |
 | [plugins/intent-driven-starter/](plugins/intent-driven-starter/) | Claude Code plugin: skills, agents, and a secret-scan hook |

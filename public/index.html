@@ -24,7 +24,7 @@
   h1 { margin: 0; font-size: 2.2rem; letter-spacing: -0.03em; }
   h1 span { color: var(--accent); }
   .tagline { margin: 4px 0 24px; color: var(--muted); }
-  form { display: flex; gap: 8px; }
+  #search { display: flex; gap: 8px; }
   input[type="text"] {
     flex: 1; min-width: 0; padding: 12px 14px; font: inherit; color: inherit;
     background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
@@ -37,6 +37,8 @@
     padding: 12px 20px; font-weight: 600; background: var(--accent); border-color: var(--accent); color: #fff;
   }
   @media (prefers-color-scheme: dark) { button[type="submit"] { color: #1b1c1f; } }
+  .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+  .top button[type="submit"] { padding: 4px 12px; font-size: 0.85rem; font-weight: 400; color: var(--muted); background: var(--surface); border-color: var(--line); }
   button:disabled { opacity: 0.6; cursor: progress; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .examples { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; }
@@ -91,6 +93,14 @@
   .arch-block p { margin: 0; }
   .arch-block ul, .arch-block ol { margin: 0; padding-left: 1.3rem; display: grid; gap: 8px; }
   .arch-block ol > li::marker { color: var(--accent); font-weight: 700; }
+  .arch-loading { display: flex; align-items: center; gap: 16px; }
+  .arch-loading p { color: var(--muted); font-size: 0.9rem; }
+  .spinner {
+    flex: none; width: 28px; height: 28px; border-radius: 50%;
+    border: 3px solid var(--bar); border-top-color: var(--accent); animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 3s; } }
   .arch-summary { font-size: 1.05rem; }
   .arch-video { font-weight: 600; color: inherit; text-decoration: none; overflow-wrap: anywhere; }
   .arch-video:hover { text-decoration: underline; }
@@ -100,7 +110,7 @@
   footer { margin-top: 32px; color: var(--muted); font-size: 0.85rem; }
   @media (max-width: 640px) {
     main { padding-top: 28px; }
-    form { flex-direction: column; }
+    #search { flex-direction: column; }
     #results li { grid-template-columns: 2rem 1fr; }
     .thumb { grid-column: 2; }
     .body { grid-column: 1 / -1; }
@@ -110,7 +120,10 @@
 </head>
 <body>
 <main>
-  <h1>Signal<span>10</span></h1>
+  <div class="top">
+    <h1>Signal<span>10</span></h1>
+    <form method="post" action="/logout"><button type="submit">Sign out</button></form>
+  </div>
   <p class="tagline">The 10 YouTube videos most worth watching for a topic, not just the 10 most viewed.</p>
 
   <form id="search">
@@ -162,8 +175,18 @@ const pathButton = document.getElementById('show-path');
 const architectButton = document.getElementById('show-architect');
 const architectPanel = document.getElementById('architect');
 let searchResults = null;
-let architectResult = null; // { view } or { error } for the current search, once asked for
+let architectResult = null; // { view } for the current search, once it has arrived
+let architectRequest = null; // the request in flight, so a second click does not start another
+let architectStartedAt = 0;
+let architectTimer = null;
 let currentView = 'top10';
+
+// The session can expire while the page is open; send the user to sign in again.
+function signedOut(res) {
+  if (res.status !== 401) return false;
+  location.href = '/login';
+  return true;
+}
 
 function pressView(view) {
   currentView = view;
@@ -173,6 +196,7 @@ function pressView(view) {
   list.hidden = view === 'architect';
   architectPanel.hidden = view !== 'architect';
   status.className = '';
+  if (view !== 'architect') clearInterval(architectTimer);
 }
 
 function el(tag, props = {}, children = []) {
@@ -294,36 +318,59 @@ function renderArchitect(view) {
   );
 }
 
+function showArchitectLoading() {
+  const elapsed = el('span');
+  const tick = () => { elapsed.textContent = `${Math.round((Date.now() - architectStartedAt) / 1000)}s elapsed.`; };
+  tick();
+  clearInterval(architectTimer);
+  architectTimer = setInterval(tick, 1000);
+  status.textContent = 'Retrieving Architect View…';
+  architectPanel.replaceChildren(el('div', { className: 'arch-block arch-loading' }, [
+    el('span', { className: 'spinner', ariaHidden: 'true' }),
+    el('div', {}, [
+      el('strong', { textContent: 'Retrieving Architect View…' }),
+      el('p', { textContent: 'Claude is reading the Top 10 and planning a route. This usually takes 15 to 30 seconds. ' }, [elapsed]),
+    ]),
+  ]));
+}
+
+function requestArchitect(topic) {
+  architectStartedAt = Date.now();
+  return fetch(`/api/architect?topic=${encodeURIComponent(topic)}`)
+    .then(async (res) => {
+      if (signedOut(res)) return { signedOut: true };
+      const data = await res.json();
+      return res.ok ? { view: data.view } : { error: data.error };
+    })
+    .catch(() => ({ error: 'Architect View could not be reached. The Top 10 and learning path are unaffected.' }));
+}
+
 async function showArchitect() {
   if (!searchResults) return;
   const search = searchResults;
   pressView('architect');
   footer.hidden = true;
 
-  if (!architectResult) {
-    architectPanel.replaceChildren();
-    status.textContent = 'Asking Claude to plan a route through these videos. This can take up to a minute…';
-    try {
-      const res = await fetch(`/api/architect?topic=${encodeURIComponent(search.topic)}`);
-      const data = await res.json();
-      if (searchResults !== search) return; // a newer search replaced this one
-      architectResult = res.ok ? { view: data.view } : { error: data.error };
-    } catch {
-      if (searchResults !== search) return;
-      architectResult = { error: 'Architect View could not be reached. The Top 10 and learning path are unaffected.' };
-    }
-    if (currentView !== 'architect') return; // the user moved on; the result is kept for later
+  let result = architectResult;
+  if (!result) {
+    architectRequest ??= requestArchitect(search.topic);
+    showArchitectLoading();
+    result = await architectRequest;
+    if (searchResults !== search || result.signedOut) return; // a newer search replaced this one
+    architectRequest = null;
+    if (result.view) architectResult = result; // an error is not kept, so the next click tries again
+    if (currentView !== 'architect') return; // the user moved on; the view is kept for later
   }
 
-  if (architectResult.error) {
+  clearInterval(architectTimer);
+  if (result.error) {
     architectPanel.replaceChildren();
     status.className = 'error';
-    status.textContent = architectResult.error;
-    architectResult = null; // let the next click try again
+    status.textContent = result.error;
     return;
   }
   status.textContent = `Architect View for “${search.topic}”.`;
-  renderArchitect(architectResult.view);
+  renderArchitect(result.view);
   footer.textContent = 'Architect View is written by Claude from the titles, channels and lengths of the Top 10 and its own knowledge of the topic. It has not watched the videos.';
   footer.hidden = false;
 }
@@ -337,10 +384,12 @@ async function run(topic) {
   footer.hidden = true;
   searchResults = null;
   architectResult = null;
+  architectRequest = null;
   architectPanel.replaceChildren();
   pressView('top10');
   try {
     const res = await fetch(`/api/top10?topic=${encodeURIComponent(topic)}`);
+    if (signedOut(res)) return;
     const data = await res.json();
     if (!res.ok) throw new Error(data.error);
     if (data.results.length === 0) {

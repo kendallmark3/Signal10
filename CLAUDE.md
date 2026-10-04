@@ -11,13 +11,14 @@ Two separate things live here:
 
 ## Commands
 
-Node 20.12+. Run `npm install` once (one dependency: `@anthropic-ai/sdk`). Only Architect View needs `ANTHROPIC_API_KEY`, read from the environment or a git-ignored `.env` beside `server.js`; tests never need it.
+Node 20.12+. Run `npm install` once (one dependency: `@anthropic-ai/sdk`). The server will not start without `SIGNAL10_USERNAME` and `SIGNAL10_PASSWORD`; Architect View also needs `ANTHROPIC_API_KEY`. All three are read from the environment or a git-ignored `.env` beside `server.js`. Tests need none of them.
 
 ```bash
 npm start                                              # http://localhost:4310 (PORT overrides)
 npm test                                               # all tests (node --test)
 node --test --test-name-pattern="near-duplicate"       # one test by name
-curl -G --data-urlencode "topic=AWS AgentCore" localhost:4310/api/top10   # API without the page
+curl -c jar -d "username=$U&password=$P" localhost:4310/login                   # sign in, save the cookie
+curl -b jar -G --data-urlencode "topic=AWS AgentCore" localhost:4310/api/top10  # API without the page
 ```
 
 The server does not hot-reload; restart it after editing `server.js` or `src/`. Port 3000 is often taken on this machine, hence 4310.
@@ -55,6 +56,10 @@ Things that are easy to get wrong:
 - `public/index.html` builds every card with `textContent`, because titles and channel names are untrusted text from YouTube. Keep it that way.
 - A plain click on a card's thumbnail or title plays the video in a `<dialog>` via a `youtube-nocookie.com/embed` iframe; modified clicks (Cmd/Ctrl/Shift) fall through to the normal YouTube link. Playback stops because the `close` handler removes the iframe `src`.
 - The `player` endpoint reports `UNPLAYABLE` for keyless callers even on playable videos, so it is used only for the publish date. Availability comes from oEmbed (403/404 mean gone; 401 only means embedding is off).
+
+- Every route except `/login` requires a session; the check sits at the top of `createApp` in `server.js`, before any routing. A new route is protected by default; do not add one above that check. `test/protection.test.js` starts the real app on a free port to prove it.
+- `src/auth.js` signs the session with a key derived from the username and password, so there is no session store and changing either credential signs everyone out. `createAuth` throws without both, which is what stops an unprotected start.
+- The session cookie gets `Secure` only when `x-forwarded-proto` is `https`, so it works on local HTTP and behind a TLS-terminating proxy.
 
 Known limitations are listed in `README.md`; update that list when one is fixed or a new one is found.
 
