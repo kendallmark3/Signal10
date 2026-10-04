@@ -24,7 +24,7 @@ The server does not hot-reload; restart it after editing `server.js` or `src/`. 
 
 ## How features are built: red commit, then green
 
-Every feature after V1 follows the same sequence, chosen by the repo owner on 2026-10-04:
+Every feature after V1 follows the same sequence, chosen by the repo owner on 2026-10-04. `TDD.md` is the full description, including the intent file layout; the steps below are the summary.
 
 1. Branch from `main` as `feature/<name>`.
 2. Write the feature intent in `intents/<name>.md`, with numbered success criteria.
