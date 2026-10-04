@@ -47,8 +47,9 @@
   .view-switch[hidden] { display: none; }
   .view-switch button { padding: 8px 12px; }
   .view-switch button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
-  ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
-  li {
+  #results { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  #results[hidden] { display: none; }
+  #results li {
     display: grid; grid-template-columns: 2.5rem 200px 1fr; gap: 16px; padding: 16px;
     background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
   }
@@ -83,11 +84,24 @@
   .player-bar a { color: var(--accent); font-size: 0.875rem; white-space: nowrap; }
   .player-bar button { padding: 4px 12px; }
   #player-frame { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; background: #000; }
+  #architect { display: grid; gap: 12px; }
+  #architect[hidden] { display: none; }
+  .arch-block { padding: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+  .arch-block h2 { margin: 0 0 8px; font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .arch-block p { margin: 0; }
+  .arch-block ul, .arch-block ol { margin: 0; padding-left: 1.3rem; display: grid; gap: 8px; }
+  .arch-block ol > li::marker { color: var(--accent); font-weight: 700; }
+  .arch-summary { font-size: 1.05rem; }
+  .arch-video { font-weight: 600; color: inherit; text-decoration: none; overflow-wrap: anywhere; }
+  .arch-video:hover { text-decoration: underline; }
+  .arch-meta { display: block; color: var(--muted); font-size: 0.85rem; }
+  .arch-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 640px) { .arch-pair { grid-template-columns: 1fr; } }
   footer { margin-top: 32px; color: var(--muted); font-size: 0.85rem; }
   @media (max-width: 640px) {
     main { padding-top: 28px; }
     form { flex-direction: column; }
-    li { grid-template-columns: 2rem 1fr; }
+    #results li { grid-template-columns: 2rem 1fr; }
     .thumb { grid-column: 2; }
     .body { grid-column: 1 / -1; }
     .signals { grid-template-columns: repeat(3, 1fr); }
@@ -110,8 +124,10 @@
   <div class="view-switch" id="view-switch" hidden>
     <button type="button" id="show-top10" aria-pressed="true">Top 10 ranking</button>
     <button type="button" id="show-path" aria-pressed="false">Build Learning Path</button>
+    <button type="button" id="show-architect" aria-pressed="false">Architect View</button>
   </div>
   <ol id="results"></ol>
+  <section id="architect" aria-label="Architect View" hidden></section>
 
   <footer id="footer" hidden>
     Ranked on topic match, views per day since posting, depth, freshness and channel standing.
@@ -143,7 +159,21 @@ const footer = document.getElementById('footer');
 const viewSwitch = document.getElementById('view-switch');
 const top10Button = document.getElementById('show-top10');
 const pathButton = document.getElementById('show-path');
+const architectButton = document.getElementById('show-architect');
+const architectPanel = document.getElementById('architect');
 let searchResults = null;
+let architectResult = null; // { view } or { error } for the current search, once asked for
+let currentView = 'top10';
+
+function pressView(view) {
+  currentView = view;
+  top10Button.setAttribute('aria-pressed', String(view === 'top10'));
+  pathButton.setAttribute('aria-pressed', String(view === 'path'));
+  architectButton.setAttribute('aria-pressed', String(view === 'architect'));
+  list.hidden = view === 'architect';
+  architectPanel.hidden = view !== 'architect';
+  status.className = '';
+}
 
 function el(tag, props = {}, children = []) {
   const node = Object.assign(document.createElement(tag), props);
@@ -218,8 +248,7 @@ function showView(learningPath) {
   if (!searchResults) return;
   const { topic, results, learningPath: path } = searchResults;
   const videos = learningPath ? path : results;
-  top10Button.setAttribute('aria-pressed', String(!learningPath));
-  pathButton.setAttribute('aria-pressed', String(learningPath));
+  pressView(learningPath ? 'path' : 'top10');
   status.textContent = learningPath
     ? `Learning path for “${topic}”, ordered from title cues.`
     : `Top ${results.length} for “${topic}”, chosen from ${searchResults.candidatesOnTopic} on-topic videos.`
@@ -231,6 +260,74 @@ function showView(learningPath) {
   footer.hidden = false;
 }
 
+function archBlock(title, children) {
+  return el('div', { className: 'arch-block' }, [el('h2', { textContent: title }), ...children]);
+}
+
+const archList = (items) => el('ul', {}, items.map((item) => el('li', { textContent: item })));
+
+function archVideos(entries, ordered) {
+  return el(ordered ? 'ol' : 'ul', {}, entries.map(({ video, why }) => el('li', {}, [
+    el('a', { href: video.url, target: '_blank', rel: 'noopener', className: 'arch-video', textContent: video.title, onclick: playOnClick(video) }),
+    el('span', { className: 'arch-meta', textContent: `${video.channel} · ${video.durationText} · #${video.rank} in the Top 10` }),
+    el('div', { textContent: why }),
+  ])));
+}
+
+function renderArchitect(view) {
+  const optional = (title, items) => (items.length > 0 ? [archBlock(title, [archList(items)])] : []);
+  architectPanel.replaceChildren(
+    archBlock('In short', [el('p', { className: 'arch-summary', textContent: view.summary })]),
+    archBlock('Watch in this order', [archVideos(view.sequence, true)]),
+    el('div', { className: 'arch-pair' }, [
+      ...optional('Before you start', view.prerequisites),
+      ...optional('Key concepts', view.keyConcepts),
+    ]),
+    el('div', { className: 'arch-pair' }, [
+      ...optional('What it changes architecturally', view.architectureImplications),
+      ...optional('Risks, dependencies and tradeoffs', view.risks),
+    ]),
+    archBlock('Can skip or leave for later', [
+      view.skip.length > 0 ? archVideos(view.skip, false) : el('p', { textContent: 'Nothing in the Top 10 overlaps enough to skip.' }),
+    ]),
+    ...(view.nextStep ? [archBlock('Try next', [el('p', { textContent: view.nextStep })])] : []),
+  );
+}
+
+async function showArchitect() {
+  if (!searchResults) return;
+  const search = searchResults;
+  pressView('architect');
+  footer.hidden = true;
+
+  if (!architectResult) {
+    architectPanel.replaceChildren();
+    status.textContent = 'Asking Claude to plan a route through these videos. This can take up to a minute…';
+    try {
+      const res = await fetch(`/api/architect?topic=${encodeURIComponent(search.topic)}`);
+      const data = await res.json();
+      if (searchResults !== search) return; // a newer search replaced this one
+      architectResult = res.ok ? { view: data.view } : { error: data.error };
+    } catch {
+      if (searchResults !== search) return;
+      architectResult = { error: 'Architect View could not be reached. The Top 10 and learning path are unaffected.' };
+    }
+    if (currentView !== 'architect') return; // the user moved on; the result is kept for later
+  }
+
+  if (architectResult.error) {
+    architectPanel.replaceChildren();
+    status.className = 'error';
+    status.textContent = architectResult.error;
+    architectResult = null; // let the next click try again
+    return;
+  }
+  status.textContent = `Architect View for “${search.topic}”.`;
+  renderArchitect(architectResult.view);
+  footer.textContent = 'Architect View is written by Claude from the titles, channels and lengths of the Top 10 and its own knowledge of the topic. It has not watched the videos.';
+  footer.hidden = false;
+}
+
 async function run(topic) {
   go.disabled = true;
   status.className = '';
@@ -239,6 +336,9 @@ async function run(topic) {
   viewSwitch.hidden = true;
   footer.hidden = true;
   searchResults = null;
+  architectResult = null;
+  architectPanel.replaceChildren();
+  pressView('top10');
   try {
     const res = await fetch(`/api/top10?topic=${encodeURIComponent(topic)}`);
     const data = await res.json();
@@ -260,6 +360,7 @@ async function run(topic) {
 
 top10Button.addEventListener('click', () => showView(false));
 pathButton.addEventListener('click', () => showView(true));
+architectButton.addEventListener('click', showArchitect);
 
 form.addEventListener('submit', (event) => {
   event.preventDefault();

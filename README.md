@@ -10,7 +10,15 @@ You enter a topic or learning goal. Signal10 returns up to 10 real YouTube video
 
 ## Run it
 
-Requires Node 20 or later. There are no dependencies to install and no API key to set up.
+Requires Node 20.12 or later. Run `npm install` once.
+
+The Top 10, the learning path and the video player need no API key. Architect View needs an Anthropic API key on the server: put it in a file named `.env` next to `server.js` (the file is git-ignored), or export it in the shell before starting.
+
+```text
+ANTHROPIC_API_KEY=your-key-here
+```
+
+Without a key, Architect View shows a message saying it is not set up and everything else works as normal.
 
 ```bash
 npm start        # serves http://localhost:4310 (set PORT to change it)
@@ -24,7 +32,7 @@ Open the page, type a topic, and press **Find the Top 10**. Click a video's thum
 The core experience is one flow:
 
 ```text
-Topic → Signal10 ranking → Top 10 → Learning Path → explanation → play in modal or open on YouTube
+Topic → Signal10 ranking → Top 10 → Learning Path → Architect View → play in modal or open on YouTube
 ```
 
 A user can:
@@ -33,8 +41,9 @@ A user can:
 2. request recommendations,
 3. review the Top 10,
 4. switch to a learning path ordered into foundation, core, deeper, and practical stages when title cues support them,
-5. play a selected video in a modal without leaving the page,
-6. open a selected video on YouTube.
+5. open Architect View, where Claude turns the Top 10 into a short plan for an architect: what to watch in order, prerequisites, what can be skipped, key concepts, architecture implications, risks, and a next step,
+6. play a selected video in a modal without leaving the page,
+7. open a selected video on YouTube.
 
 The learning path is an additional view; the original Top 10 ranking remains available. Its stage suggestions and explanations are inferred from wording in video titles, not verified video contents.
 
@@ -80,7 +89,9 @@ Each result shows its score, the five signal bars, a one-sentence reason, and wh
 
 ## Known limitations
 
-- **No API key means an unofficial data source.** Results come from the same public endpoints youtube.com uses. YouTube can change or rate-limit them without notice, and a hosted deployment should move to the YouTube Data API.
+- **Architect View has not watched the videos.** Claude sees only each video's rank, title, channel, length and age, and adds its own knowledge of the topic. Its concepts, implications and risks can be out of date for a new technology, and its guesses about what a video covers can be wrong. Every video it names is one of Signal10's Top 10; it cannot add others.
+- **Architect View costs money and takes time.** Each new topic makes one call to Claude Opus 5.5 on your API key and can take up to a minute. The result is kept in memory for 15 minutes, so reopening it is free.
+- **No YouTube API key means an unofficial data source.** Results come from the same public endpoints youtube.com uses. YouTube can change or rate-limit them without notice, and a hosted deployment should move to the YouTube Data API.
 - **No engagement signal.** Likes and comment counts are not in search results, so momentum stands in for audience response.
 - **Topic match is word-based.** A video counts as a full match only if its title or channel contains every topic word. Abbreviations and word forms are not understood, so "AI TDD" is a partial match for "Test-Driven Development with AI", and "retire" does not match "retirement". Nothing judges what a video actually teaches.
 - **The full-match head start is a fixed 15 points.** It is a compromise: large enough to push sibling certifications down the "Claude Certified Architect Foundations" list, but one still appears at #10, and in "Mapbox development" a weak video that says "development" still sits mid-list above a few stronger ones.
@@ -137,7 +148,8 @@ Signal10 follows a progressive-intent approach: get a real V1 running, learn fro
 | --- | --- |
 | [intent.md](intent.md) | The V1 intent this README is drawn from |
 | [intents/](intents/) | One intent per feature built after V1 |
-| [server.js](server.js) | HTTP server: the page and `/api/top10` |
+| [server.js](server.js) | HTTP server: the page, `/api/top10` and `/api/architect` |
+| [src/architect.js](src/architect.js) | Architect View: the one Claude call and the checks on its reply |
 | [src/youtube.js](src/youtube.js) | Fetches and parses real video metadata from YouTube |
 | [src/rank.js](src/rank.js) | Scoring, de-duplication, and explanations |
 | [src/learning-path.js](src/learning-path.js) | Title-cue learning-path staging and explanations |

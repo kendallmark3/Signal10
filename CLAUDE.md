@@ -6,12 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Two separate things live here:
 
-1. **Signal10** — the product. Given a topic, it returns the 10 YouTube videos most worth watching, ranked on more than lifetime view count. V1 is complete (2026-10-03): a dependency-free Node app. New work is a new feature with its own intent, not an extension of V1.
+1. **Signal10** — the product. Given a topic, it returns the 10 YouTube videos most worth watching, ranked on more than lifetime view count. V1 is complete (2026-10-03): a small Node app whose only dependency is the Anthropic SDK, used by Architect View. New work is a new feature with its own intent, not an extension of V1.
 2. **A vendored copy of the Intent-Driven Starter plugin** (`plugins/intent-driven-starter/`, `.claude-plugin/marketplace.json`, `DESIGN.md`), copied from `github.com/kendallmark3/intent-driven-starter`. It is tooling for building Signal10, not part of the product. `DESIGN.md` describes the plugin, not Signal10.
 
 ## Commands
 
-Node 20+, no dependencies, no install step, no API key.
+Node 20.12+. Run `npm install` once (one dependency: `@anthropic-ai/sdk`). Only Architect View needs `ANTHROPIC_API_KEY`, read from the environment or a git-ignored `.env` beside `server.js`; tests never need it.
 
 ```bash
 npm start                                              # http://localhost:4310 (PORT overrides)
@@ -37,7 +37,7 @@ Do not write implementation before the red commit exists, and do not edit a red 
 
 ## Signal10 architecture
 
-One request flows through three files:
+A Top 10 request flows through three files:
 
 1. `src/youtube.js` — the only code that talks to YouTube. It posts to the keyless `youtubei/v1/search` endpoint three times (all time, this year, this month), walks the response for `videoRenderer` nodes, and parses YouTube's display text ("22,606 views", "3 weeks ago", "1:08:21") into numbers. A field YouTube does not return stays `null`; nothing is estimated.
 2. `src/rank.js` — pure functions, no network or clock, which is why the tests need no mocks. `scoreCandidates` filters and scores, `pickDiverse` removes near-duplicate titles and caps each channel at two, `present` adds rank, headline, reason, and `rankByViews`.
@@ -48,7 +48,10 @@ Things that are easy to get wrong:
 - `scoreCandidates` orders by score plus `FULL_MATCH_MARGIN` (15) for full topic matches, so list order does not follow the displayed `score` across the full/partial boundary. `missingWords` on each result drives the "Partial match" chip and reason. The margin was tuned against live searches; changing it trades the "Claude Certified Architect Foundations" result against "Mapbox development".
 - Momentum is a percentile within the candidate pool, so a video's score depends on what else the search returned. Scores are not comparable across topics.
 - Scoring uses the approximate age parsed from relative text. The exact `publishedDate` arrives after scoring and is display-only.
-- The reason sentence and the headline chip are generated in `rank.js` from the signals, never by a model. Any future LLM use must not be allowed to produce titles, counts, dates, or links.
+- The reason sentence and the headline chip are generated in `rank.js` from the signals, never by a model.
+- `src/architect.js` is the only place a model is used. `buildRequest` sends rank, title, channel, length and age for the Top 10 and nothing else; the model replies with ranks and prose; `interpret` resolves each rank back to Signal10's own result, so the model cannot introduce a title, link or video. Keep that boundary: never render a title or URL taken from the reply. Video titles are untrusted text inside the prompt, which is why the reply is schema-constrained and rendered with `textContent`.
+- `architectView` takes the SDK client as an argument (`null` when there is no key), which is how the tests run it against a fake. `server.js` builds the real client once and keeps recent searches in memory so Architect View reasons about the list the user is looking at and a repeat click makes no second call.
+- The request uses `claude-opus-5-5` with server-side `fallbacks: "default"`, so a safety decline is retried on Anthropic's recommended fallback model before the user sees an error.
 - `public/index.html` builds every card with `textContent`, because titles and channel names are untrusted text from YouTube. Keep it that way.
 - A plain click on a card's thumbnail or title plays the video in a `<dialog>` via a `youtube-nocookie.com/embed` iframe; modified clicks (Cmd/Ctrl/Shift) fall through to the normal YouTube link. Playback stops because the `close` handler removes the iframe `src`.
 - The `player` endpoint reports `UNPLAYABLE` for keyless callers even on playable videos, so it is used only for the publish date. Availability comes from oEmbed (403/404 mean gone; 401 only means embedding is off).
