@@ -69,20 +69,48 @@ async function innertube(endpoint, body) {
   return res.json();
 }
 
-export async function searchVideos(query, filter = FILTERS.videos) {
+const runsText = (text) => ((text?.runs ?? []).map((run) => run.text).join('') || text?.simpleText || '').trim();
+
+// YouTube's own spelling correction for a search, when its reply offers one. It comes as
+// "Showing results for" or as "Did you mean"; both carry the corrected phrase.
+export function correctionFrom(node) {
+  if (!node || typeof node !== 'object') return null;
+  const renderer = node.showingResultsForRenderer ?? node.didYouMeanRenderer;
+  if (renderer) return runsText(renderer.correctedQuery) || null;
+  for (const value of Object.values(node)) {
+    const found = correctionFrom(value);
+    if (found) return found;
+  }
+  return null;
+}
+
+const comparable = (phrase) => phrase.trim().replace(/\s+/g, ' ').toLowerCase();
+
+// The first correction that differs from what the user typed, or null. A suggestion is
+// only ever offered; the typed topic is still the one that is searched and scored.
+export function suggestionFor(topic, corrections) {
+  return corrections.find((c) => c && comparable(c) !== comparable(topic)) ?? null;
+}
+
+async function search(query, filter) {
   const data = await innertube('search', { query, params: filter });
-  return collectVideoRenderers(data).filter((r) => r.videoId).map(toCandidate);
+  return { videos: collectVideoRenderers(data).filter((r) => r.videoId).map(toCandidate), correction: correctionFrom(data) };
+}
+
+export async function searchVideos(query, filter = FILTERS.videos) {
+  return (await search(query, filter)).videos;
 }
 
 // Runs the topic through several searches so newer videos get into the pool, not only
 // the all-time results. Each candidate keeps its best position across the searches.
+// Returns the pool and, when YouTube corrected the spelling, the phrase it suggests.
 export async function gatherCandidates(topic) {
-  const searches = await Promise.allSettled(Object.values(FILTERS).map((f) => searchVideos(topic, f)));
+  const searches = await Promise.allSettled(Object.values(FILTERS).map((f) => search(topic, f)));
   const ok = searches.filter((s) => s.status === 'fulfilled');
   if (ok.length === 0) throw new Error(`YouTube search failed: ${searches[0].reason?.message ?? 'unknown error'}`);
 
   const byId = new Map();
-  for (const { value: list } of ok) {
+  for (const { value: { videos: list } } of ok) {
     list.forEach((candidate, index) => {
       const position = index / Math.max(list.length, 1);
       const seen = byId.get(candidate.id);
@@ -90,7 +118,7 @@ export async function gatherCandidates(topic) {
       else seen.searchPosition = Math.min(seen.searchPosition, position);
     });
   }
-  return [...byId.values()];
+  return { candidates: [...byId.values()], suggestion: suggestionFor(topic, ok.map((s) => s.value.correction)) };
 }
 
 // oEmbed answers 404 for deleted videos and 403 for private ones. 401 means embedding

@@ -121,6 +121,9 @@ Each result shows its score, the five signal bars, a one-sentence reason, and wh
 - **Age is approximate in scoring.** Ranking uses YouTube's relative text ("3 weeks ago"); the exact date is fetched only for display.
 - **Some videos will not play in the modal.** Creators can disable playback outside youtube.com; those show YouTube's own message, and the modal's "Open on YouTube" link is the way through.
 - **English, US results only.**
+- **Recent searches live in one browser.** The five most recent are kept in that browser's local storage, so they do not follow you to another device or browser, and a private window forgets them.
+- **A misspelled search is searched as typed.** "Did you mean" is YouTube's own correction, offered beside the results and never applied. The typed phrase is still what Signal10 matches titles against, so a misspelling usually returns fewer results until the suggestion is clicked. The misspelled phrase is also kept in Recent.
+- **Typo help depends on YouTube.** When YouTube offers no correction, Signal10 suggests nothing; it has no dictionary of its own.
 - **The logo has one version.** Its lettering is dark, so the dark theme shows it on a light plate rather than using artwork drawn for a dark background.
 - **No exact publish dates on AWS.** YouTube's `player` endpoint returns no publish date to requests from AWS addresses, so the deployed site shows only the relative age ("3 weeks ago"). Ranking is unaffected, since it never used the exact date.
 - **The sign-in lockout is per Lambda instance on AWS.** The failed-attempt counter lives in memory, so when Lambda runs more than one instance each keeps its own count, and a new instance starts at zero.
@@ -178,6 +181,7 @@ Signal10 follows a progressive-intent approach: get a real V1 running, learn fro
 | [src/rank.js](src/rank.js) | Scoring, de-duplication, and explanations |
 | [src/learning-path.js](src/learning-path.js) | Title-cue learning-path staging and explanations |
 | [public/index.html](public/index.html) | The single-page interface |
+| [public/recent.js](public/recent.js) | Recent searches: the list rules and local-storage handling |
 | [public/login.html](public/login.html) | The sign-in screen |
 | [public/logo.webp](public/logo.webp) | The logo as served, made from [assets/logo-source.png](assets/logo-source.png) |
 | [scripts/deploy-aws.js](scripts/deploy-aws.js) | `npm run deploy:aws`: deploys to AWS Lambda |

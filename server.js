@@ -24,6 +24,7 @@ const LIMIT = 10;
 const SPARES = 5; // extra picks to fall back on when a video turns out to be unavailable
 const PAGE = fileURLToPath(new URL('./public/index.html', import.meta.url));
 const LOGIN_PAGE = fileURLToPath(new URL('./public/login.html', import.meta.url));
+const RECENT_SCRIPT = fileURLToPath(new URL('./public/recent.js', import.meta.url));
 // Read once. The sign-in page embeds it, so showing the logo there needs no unprotected route.
 const LOGO = readFileSync(new URL('./public/logo.webp', import.meta.url));
 const LOGO_DATA_URI = `data:image/webp;base64,${LOGO.toString('base64')}`;
@@ -61,7 +62,7 @@ async function architect(topic) {
 const ARCHITECT_STATUS = { not_configured: 503, refused: 422, failed: 502 };
 
 export async function top10(topic) {
-  const candidates = await gatherCandidates(topic);
+  const { candidates, suggestion } = await gatherCandidates(topic);
   const scored = scoreCandidates(topic, candidates);
   const shortlist = pickDiverse(scored, LIMIT + SPARES);
 
@@ -72,6 +73,7 @@ export async function top10(topic) {
   const results = present(picked.map((c, i) => ({ ...c, publishedDate: dates[i] })));
   return {
     topic,
+    suggestion,
     candidatesFound: candidates.length,
     candidatesOnTopic: scored.length,
     results,
@@ -147,6 +149,11 @@ export function createApp({ auth }) {
     if (url.pathname === '/') {
       res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' });
       return res.end(await readFile(PAGE));
+    }
+
+    if (url.pathname === '/recent.js') {
+      res.writeHead(200, { 'content-type': 'text/javascript; charset=utf-8', 'cache-control': 'no-store' });
+      return res.end(await readFile(RECENT_SCRIPT));
     }
 
     if (url.pathname === '/logo.webp') {

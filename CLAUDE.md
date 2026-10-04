@@ -66,6 +66,9 @@ Things that are easy to get wrong:
 
 - The logo is `public/logo.webp`, served at `/logo.webp` behind the session check. The sign-in page cannot fetch it without a session, so `server.js` embeds it there as a data URI in place of `<!--logo-->`. To replace the logo, regenerate the WebP from `assets/logo-source.png` (`cwebp -crop 146 104 1886 525 -resize 1200 0 -q 90 -alpha_q 100`) and update the `width` and `height` attributes on both pages if the proportions change.
 
+- `public/recent.js` is the one script shared by the browser and the tests: the page imports it from `/recent.js` (served behind the session check) and `test/recent.test.js` imports the same file. The page's own script is `type="module"` for that import.
+- "Did you mean" is YouTube's correction (`correctionFrom` in `src/youtube.js`), read from the search replies already being fetched. `gatherCandidates` returns `{ candidates, suggestion }`. The suggestion is offered, never applied: the typed topic is what gets scored.
+
 Known limitations are listed in `README.md`; update that list when one is fixed or a new one is found.
 
 ## Source of truth for Signal10
