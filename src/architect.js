@@ -30,7 +30,7 @@ You are given the topic and a short list of videos that a ranking tool has alrea
 
 Produce a concise plan the architect can scan in under a minute:
 - summary: one or two sentences on what this topic is and why an architect would care.
-- sequence: the three to six videos worth watching, in the order to watch them, each with one sentence on why it belongs at that point. Refer to videos only by their rank number.
+- sequence: the three to six videos worth watching, in the order to watch them, each with one sentence on why it belongs at that point. Refer to videos only by their rank number, and when a sentence mentions another video write it as #N.
 - prerequisites: what the architect should already know before starting.
 - skip: videos from the list that overlap with ones in the sequence or add little, each with one sentence saying which video covers the same ground or why it can wait. Leave it empty if nothing overlaps.
 - keyConcepts: the concepts to come away understanding.

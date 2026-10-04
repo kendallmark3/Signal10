@@ -30,8 +30,11 @@ const recent = new Map();
 const topicKey = (topic) => topic.toLowerCase();
 
 function remember(topic, data) {
+  // Searching again usually returns the same ten videos; keep the view already paid for.
+  const previous = recent.get(topicKey(topic));
+  const sameList = previous && previous.data.results.map((r) => r.id).join() === data.results.map((r) => r.id).join();
   recent.delete(topicKey(topic));
-  recent.set(topicKey(topic), { data, at: Date.now(), view: null });
+  recent.set(topicKey(topic), { data, at: Date.now(), view: sameList ? previous.view : null });
   if (recent.size > RECENT_LIMIT) recent.delete(recent.keys().next().value);
   return data;
 }
