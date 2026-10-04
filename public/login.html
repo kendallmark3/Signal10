@@ -20,6 +20,8 @@
   @media (prefers-color-scheme: dark) { .logo { padding: 10px 14px; background: #faf9f6; border-radius: 12px; } }
   p { margin: 0; color: var(--muted); font-size: 0.9rem; }
   .message { color: var(--accent); font-weight: 600; }
+  .credit { padding-top: 14px; border-top: 1px solid var(--line); font-size: 0.8rem; text-align: center; }
+  .credit a { color: var(--accent); }
   .message:empty { display: none; }
   label { display: grid; gap: 4px; font-size: 0.875rem; color: var(--muted); }
   input { padding: 11px 12px; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; }
@@ -39,6 +41,7 @@
     <input type="password" name="password" autocomplete="current-password" required>
   </label>
   <button type="submit">Sign in</button>
+  <p class="credit">Developed by Mark Kendall at <a href="https://repogenic.com" target="_blank" rel="noopener">repogenic.com</a></p>
 </form>
 </body>
 </html>

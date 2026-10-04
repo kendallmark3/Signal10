@@ -111,6 +111,8 @@
   .arch-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   @media (max-width: 640px) { .arch-pair { grid-template-columns: 1fr; } }
   footer { margin-top: 32px; color: var(--muted); font-size: 0.85rem; }
+  .credit { margin: 48px 0 0; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 0.85rem; text-align: center; }
+  .credit a { color: var(--accent); }
   @media (max-width: 640px) {
     main { padding-top: 28px; }
     #search { flex-direction: column; }
@@ -149,6 +151,7 @@
     Ranked on topic match, views per day since posting, depth, freshness and channel standing.
     Every title, count and date comes from YouTube.
   </footer>
+  <p class="credit">Developed by Mark Kendall at <a href="https://repogenic.com" target="_blank" rel="noopener">repogenic.com</a></p>
 </main>
 
 <dialog id="player" aria-labelledby="player-title">
