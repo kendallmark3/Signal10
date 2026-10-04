@@ -43,6 +43,10 @@
   .examples button { padding: 4px 12px; font-size: 0.85rem; color: var(--muted); border-radius: 999px; }
   #status { margin: 32px 0 16px; color: var(--muted); min-height: 1.5em; }
   #status.error { color: var(--accent); }
+  .view-switch { display: flex; gap: 8px; margin: 16px 0; }
+  .view-switch[hidden] { display: none; }
+  .view-switch button { padding: 8px 12px; }
+  .view-switch button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
   ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
   li {
     display: grid; grid-template-columns: 2.5rem 200px 1fr; gap: 16px; padding: 16px;
@@ -102,6 +106,10 @@
   <div class="examples" id="examples" aria-label="Example topics"></div>
 
   <p id="status" role="status" aria-live="polite"></p>
+  <div class="view-switch" id="view-switch" hidden>
+    <button type="button" id="show-top10" aria-pressed="true">Top 10 ranking</button>
+    <button type="button" id="show-path" aria-pressed="false">Build Learning Path</button>
+  </div>
   <ol id="results"></ol>
 
   <footer id="footer" hidden>
@@ -131,6 +139,10 @@ const go = document.getElementById('go');
 const status = document.getElementById('status');
 const list = document.getElementById('results');
 const footer = document.getElementById('footer');
+const viewSwitch = document.getElementById('view-switch');
+const top10Button = document.getElementById('show-top10');
+const pathButton = document.getElementById('show-path');
+let searchResults = null;
 
 function el(tag, props = {}, children = []) {
   const node = Object.assign(document.createElement(tag), props);
@@ -167,7 +179,7 @@ function formatDate(v) {
   return v.publishedText ? `${date} (${v.publishedText.replace(/^(streamed|premiered) /i, '')})` : date;
 }
 
-function card(v, total) {
+function card(v, total, learningPath = false) {
   const meta = [
     v.channel + (v.verified ? ' ✓' : ''),
     formatDate(v),
@@ -176,7 +188,7 @@ function card(v, total) {
 
   const link = { href: v.url, target: '_blank', rel: 'noopener', onclick: playOnClick(v) };
   return el('li', {}, [
-    el('div', { className: 'rank', textContent: v.rank, ariaLabel: `Rank ${v.rank}` }),
+    el('div', { className: 'rank', textContent: learningPath ? v.step : v.rank, ariaLabel: learningPath ? `Path step ${v.step}` : `Rank ${v.rank}` }),
     el('a', { ...link, className: 'thumb', tabIndex: -1, ariaHidden: 'true' }, [
       el('img', { src: v.thumbnail, alt: '', loading: 'lazy' }),
       el('span', { textContent: v.durationText }),
@@ -185,12 +197,14 @@ function card(v, total) {
       el('a', { ...link, className: 'title', textContent: v.title }),
       el('div', { className: 'meta', textContent: meta }),
       el('div', { className: 'why' }, [
-        el('span', { className: 'headline', textContent: v.headline }),
-        el('span', { className: 'score', textContent: `Signal score ${v.score}` }),
-        el('span', { className: 'views-rank', textContent: v.views == null ? '' : `· #${v.rankByViews} of ${total} by views alone` }),
+        el('span', { className: 'headline', textContent: learningPath ? v.stage : v.headline }),
+        ...(!learningPath ? [
+          el('span', { className: 'score', textContent: `Signal score ${v.score}` }),
+          el('span', { className: 'views-rank', textContent: v.views == null ? '' : `· #${v.rankByViews} of ${total} by views alone` }),
+        ] : []),
       ]),
-      el('p', { className: 'reason', textContent: v.reason }),
-      el('dl', { className: 'signals' }, SIGNALS.map(([key, label]) => {
+      el('p', { className: 'reason', textContent: learningPath ? v.pathReason : v.reason }),
+      el('dl', { className: 'signals', hidden: learningPath }, SIGNALS.map(([key, label]) => {
         const bar = el('i');
         bar.style.width = `${Math.round(v.signals[key] * 100)}%`;
         return el('div', {}, [el('dt', { textContent: label }), el('dd', { title: `${label}: ${Math.round(v.signals[key] * 100)} of 100` }, [bar])]);
@@ -199,12 +213,31 @@ function card(v, total) {
   ]);
 }
 
+function showView(learningPath) {
+  if (!searchResults) return;
+  const { topic, results, learningPath: path } = searchResults;
+  const videos = learningPath ? path : results;
+  top10Button.setAttribute('aria-pressed', String(!learningPath));
+  pathButton.setAttribute('aria-pressed', String(learningPath));
+  status.textContent = learningPath
+    ? `Learning path for “${topic}”, ordered from title cues.`
+    : `Top ${results.length} for “${topic}”, chosen from ${searchResults.candidatesOnTopic} on-topic videos.`
+      + (results.length < 10 ? ' Fewer than 10 were a good enough match.' : '');
+  list.replaceChildren(...videos.map((v) => card(v, results.length, learningPath)));
+  footer.textContent = learningPath
+    ? 'The path is inferred from wording in video titles; check each video to confirm its contents.'
+    : 'Ranked on topic match, views per day since posting, depth, freshness and channel standing. Every title, count and date comes from YouTube.';
+  footer.hidden = false;
+}
+
 async function run(topic) {
   go.disabled = true;
   status.className = '';
   status.textContent = `Searching YouTube for “${topic}”…`;
   list.replaceChildren();
+  viewSwitch.hidden = true;
   footer.hidden = true;
+  searchResults = null;
   try {
     const res = await fetch(`/api/top10?topic=${encodeURIComponent(topic)}`);
     const data = await res.json();
@@ -213,11 +246,9 @@ async function run(topic) {
       status.textContent = `No videos matched “${topic}” closely enough. Try a broader or differently worded topic.`;
       return;
     }
-    const n = data.results.length;
-    status.textContent = `Top ${n} for “${data.topic}”, chosen from ${data.candidatesOnTopic} on-topic videos.`
-      + (n < 10 ? ' Fewer than 10 were a good enough match.' : '');
-    list.replaceChildren(...data.results.map((v) => card(v, n)));
-    footer.hidden = false;
+    searchResults = data;
+    viewSwitch.hidden = false;
+    showView(false);
   } catch (err) {
     status.className = 'error';
     status.textContent = err.message || 'Something went wrong. Try again.';
@@ -225,6 +256,9 @@ async function run(topic) {
     go.disabled = false;
   }
 }
+
+top10Button.addEventListener('click', () => showView(false));
+pathButton.addEventListener('click', () => showView(true));
 
 form.addEventListener('submit', (event) => {
   event.preventDefault();

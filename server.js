@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { gatherCandidates, isAvailable, fetchPublishDate } from './src/youtube.js';
 import { scoreCandidates, pickDiverse, present } from './src/rank.js';
+import { buildLearningPath } from './src/learning-path.js';
 
 const PORT = Number(process.env.PORT) || 4310;
 const LIMIT = 10;
@@ -18,11 +19,13 @@ export async function top10(topic) {
   const picked = shortlist.filter((_, i) => availability[i]).slice(0, LIMIT);
   const dates = await Promise.all(picked.map((c) => fetchPublishDate(c.id)));
 
+  const results = present(picked.map((c, i) => ({ ...c, publishedDate: dates[i] })));
   return {
     topic,
     candidatesFound: candidates.length,
     candidatesOnTopic: scored.length,
-    results: present(picked.map((c, i) => ({ ...c, publishedDate: dates[i] }))),
+    results,
+    learningPath: buildLearningPath(results),
   };
 }
 

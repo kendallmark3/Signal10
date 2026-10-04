@@ -24,7 +24,7 @@ Open the page, type a topic, and press **Find the Top 10**. Click a video's thum
 The core experience is one flow:
 
 ```text
-Topic → Signal10 ranking → Top 10 → explanation → play in modal or open on YouTube
+Topic → Signal10 ranking → Top 10 → Learning Path → explanation → play in modal or open on YouTube
 ```
 
 A user can:
@@ -32,8 +32,11 @@ A user can:
 1. enter a topic,
 2. request recommendations,
 3. review the Top 10,
-4. play a selected video in a modal without leaving the page,
-5. open a selected video on YouTube.
+4. switch to a learning path ordered into foundation, core, deeper, and practical stages when title cues support them,
+5. play a selected video in a modal without leaving the page,
+6. open a selected video on YouTube.
+
+The learning path is an additional view; the original Top 10 ranking remains available. Its stage suggestions and explanations are inferred from wording in video titles, not verified video contents.
 
 Example topics:
 
@@ -78,6 +81,7 @@ Each result shows its score, the five signal bars, a one-sentence reason, and wh
 - **No API key means an unofficial data source.** Results come from the same public endpoints youtube.com uses. YouTube can change or rate-limit them without notice, and a hosted deployment should move to the YouTube Data API.
 - **No engagement signal.** Likes and comment counts are not in search results, so momentum stands in for audience response.
 - **Topic match is word-based.** For "Claude Certified Architect Foundations", videos about the sibling Developer and Associate certifications still make the list because they share three of four words. Nothing judges what a video actually teaches.
+- **Learning-path stages are title-based clues.** A title can suggest an introduction, advanced treatment, or practical tutorial without proving what the video covers; check the video itself.
 - **Depth is length.** A long video scores as deep whether or not it is.
 - **Freshness is always on.** It applies the same weight to "Retirement investing" as to a fast-moving technology topic.
 - **Brand-new videos get noisy momentum.** A video posted hours ago is treated as one day old.
@@ -132,8 +136,9 @@ Signal10 follows a progressive-intent approach: get a real V1 running, learn fro
 | [server.js](server.js) | HTTP server: the page and `/api/top10` |
 | [src/youtube.js](src/youtube.js) | Fetches and parses real video metadata from YouTube |
 | [src/rank.js](src/rank.js) | Scoring, de-duplication, and explanations |
+| [src/learning-path.js](src/learning-path.js) | Title-cue learning-path staging and explanations |
 | [public/index.html](public/index.html) | The single-page interface |
-| [test/](test/) | Tests for ranking and parsing |
+| [test/](test/) | Tests for ranking, parsing, and learning paths |
 | [DESIGN.md](DESIGN.md) | Design notes for the Intent-Driven Starter plugin |
 | [plugins/intent-driven-starter/](plugins/intent-driven-starter/) | Claude Code plugin: skills, agents, and a secret-scan hook |
 | [.claude-plugin/](.claude-plugin/) | Marketplace definition for the plugin |
