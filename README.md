@@ -81,7 +81,7 @@ Each result shows its score, the five signal bars, a one-sentence reason, and wh
 - **No API key means an unofficial data source.** Results come from the same public endpoints youtube.com uses. YouTube can change or rate-limit them without notice, and a hosted deployment should move to the YouTube Data API.
 - **No engagement signal.** Likes and comment counts are not in search results, so momentum stands in for audience response.
 - **Topic match is word-based.** For "Claude Certified Architect Foundations", videos about the sibling Developer and Associate certifications still make the list because they share three of four words. Nothing judges what a video actually teaches.
-- **Learning-path stages are title-based clues.** A title can suggest an introduction, advanced treatment, or practical tutorial without proving what the video covers; check the video itself.
+- **Learning-path stages are title-based clues.** A title can suggest an introduction, advanced treatment, or practice without proving what the video covers; check the video itself. Videos whose titles carry no such wording stay in the core stage, ordered shortest first.
 - **Depth is length.** A long video scores as deep whether or not it is.
 - **Freshness is always on.** It applies the same weight to "Retirement investing" as to a fast-moving technology topic.
 - **Brand-new videos get noisy momentum.** A video posted hours ago is treated as one day old.
