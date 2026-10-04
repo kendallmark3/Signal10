@@ -69,7 +69,7 @@ test('a correct sign-in sets an HttpOnly cookie and the page then loads', async 
 
     const page = await request('/', { headers: { cookie: cookieFrom(response) } });
     assert.equal(page.status, 200);
-    assert.match(await page.text(), /Signal<span>10/);
+    assert.match(await page.text(), /<form id="search">/);
   });
 });
 

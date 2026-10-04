@@ -64,6 +64,8 @@ Things that are easy to get wrong:
 
 - `scripts/deploy-aws.js` deploys to Lambda (`signal10`, us-east-2) behind a Function URL, with the AWS Lambda Web Adapter layer running `run.sh`. App Runner is not open to this account. Only the paths in `BUNDLE` are uploaded, so a new top-level runtime file must be added there. Secrets go to AWS in a file reference, never as CLI arguments.
 
+- The logo is `public/logo.webp`, served at `/logo.webp` behind the session check. The sign-in page cannot fetch it without a session, so `server.js` embeds it there as a data URI in place of `<!--logo-->`. To replace the logo, regenerate the WebP from `assets/logo-source.png` (`cwebp -crop 146 104 1886 525 -resize 1200 0 -q 90 -alpha_q 100`) and update the `width` and `height` attributes on both pages if the proportions change.
+
 Known limitations are listed in `README.md`; update that list when one is fixed or a new one is found.
 
 ## Source of truth for Signal10

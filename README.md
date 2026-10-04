@@ -121,6 +121,7 @@ Each result shows its score, the five signal bars, a one-sentence reason, and wh
 - **Age is approximate in scoring.** Ranking uses YouTube's relative text ("3 weeks ago"); the exact date is fetched only for display.
 - **Some videos will not play in the modal.** Creators can disable playback outside youtube.com; those show YouTube's own message, and the modal's "Open on YouTube" link is the way through.
 - **English, US results only.**
+- **The logo has one version.** Its lettering is dark, so the dark theme shows it on a light plate rather than using artwork drawn for a dark background.
 - **No exact publish dates on AWS.** YouTube's `player` endpoint returns no publish date to requests from AWS addresses, so the deployed site shows only the relative age ("3 weeks ago"). Ranking is unaffected, since it never used the exact date.
 - **The sign-in lockout is per Lambda instance on AWS.** The failed-attempt counter lives in memory, so when Lambda runs more than one instance each keeps its own count, and a new instance starts at zero.
 - **Secrets on AWS are Lambda environment variables.** They are encrypted at rest but readable by anyone with access to the function's configuration in the AWS account.
@@ -178,6 +179,7 @@ Signal10 follows a progressive-intent approach: get a real V1 running, learn fro
 | [src/learning-path.js](src/learning-path.js) | Title-cue learning-path staging and explanations |
 | [public/index.html](public/index.html) | The single-page interface |
 | [public/login.html](public/login.html) | The sign-in screen |
+| [public/logo.webp](public/logo.webp) | The logo as served, made from [assets/logo-source.png](assets/logo-source.png) |
 | [scripts/deploy-aws.js](scripts/deploy-aws.js) | `npm run deploy:aws`: deploys to AWS Lambda |
 | [run.sh](run.sh) | Lambda entry point; starts `server.js` |
 | [test/](test/) | Tests for ranking, parsing, and learning paths |

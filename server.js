@@ -1,5 +1,6 @@
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { gatherCandidates, isAvailable, fetchPublishDate } from './src/youtube.js';
 import { scoreCandidates, pickDiverse, present } from './src/rank.js';
@@ -23,6 +24,9 @@ const LIMIT = 10;
 const SPARES = 5; // extra picks to fall back on when a video turns out to be unavailable
 const PAGE = fileURLToPath(new URL('./public/index.html', import.meta.url));
 const LOGIN_PAGE = fileURLToPath(new URL('./public/login.html', import.meta.url));
+// Read once. The sign-in page embeds it, so showing the logo there needs no unprotected route.
+const LOGO = readFileSync(new URL('./public/logo.webp', import.meta.url));
+const LOGO_DATA_URI = `data:image/webp;base64,${LOGO.toString('base64')}`;
 
 // Without a key, Architect View reports "not configured" and everything else works as before.
 const anthropic = process.env.ANTHROPIC_API_KEY ? new Anthropic() : null;
@@ -124,7 +128,7 @@ export function createApp({ auth }) {
         return redirect(res, '/', { 'set-cookie': sessionCookie(req, result.session, result.maxAgeSeconds) });
       }
       const message = url.searchParams.has('locked') ? SIGN_IN_MESSAGES.locked : url.searchParams.has('error') ? SIGN_IN_MESSAGES.error : '';
-      const page = (await readFile(LOGIN_PAGE, 'utf8')).replace('<!--message-->', message);
+      const page = (await readFile(LOGIN_PAGE, 'utf8')).replace('<!--message-->', message).replace('<!--logo-->', LOGO_DATA_URI);
       res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' });
       return res.end(page);
     }
@@ -143,6 +147,11 @@ export function createApp({ auth }) {
     if (url.pathname === '/') {
       res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' });
       return res.end(await readFile(PAGE));
+    }
+
+    if (url.pathname === '/logo.webp') {
+      res.writeHead(200, { 'content-type': 'image/webp', 'cache-control': 'private, max-age=86400' });
+      return res.end(LOGO);
     }
 
     if (url.pathname === '/api/top10' || url.pathname === '/api/architect') {

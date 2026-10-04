@@ -21,8 +21,11 @@
     font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
   }
   main { max-width: 860px; margin: 0 auto; padding: 48px 16px 80px; }
-  h1 { margin: 0; font-size: 2.2rem; letter-spacing: -0.03em; }
-  h1 span { color: var(--accent); }
+  h1 { margin: 0; flex: 0 1 400px; min-width: 0; }
+  /* The width and height attributes carry the real proportions, so the logo scales without skewing. */
+  .logo { display: block; box-sizing: border-box; width: 100%; max-width: 100%; height: auto; }
+  /* The lettering is dark on a transparent background, so the dark theme gives it a light plate. */
+  @media (prefers-color-scheme: dark) { .logo { padding: 10px 14px; background: #faf9f6; border-radius: 12px; } }
   .tagline { margin: 4px 0 24px; color: var(--muted); }
   #search { display: flex; gap: 8px; }
   input[type="text"] {
@@ -38,7 +41,7 @@
   }
   @media (prefers-color-scheme: dark) { button[type="submit"] { color: #1b1c1f; } }
   .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
-  .top button[type="submit"] { padding: 4px 12px; font-size: 0.85rem; font-weight: 400; color: var(--muted); background: var(--surface); border-color: var(--line); }
+  .top button[type="submit"] { white-space: nowrap; padding: 4px 12px; font-size: 0.85rem; font-weight: 400; color: var(--muted); background: var(--surface); border-color: var(--line); }
   button:disabled { opacity: 0.6; cursor: progress; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .examples { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; }
@@ -121,7 +124,7 @@
 <body>
 <main>
   <div class="top">
-    <h1>Signal<span>10</span></h1>
+    <h1><img class="logo" src="/logo.webp" alt="Signal10" width="1200" height="335"></h1>
     <form method="post" action="/logout"><button type="submit">Sign out</button></form>
   </div>
   <p class="tagline">The 10 YouTube videos most worth watching for a topic, not just the 10 most viewed.</p>
