@@ -1,0 +1,9 @@
+{
+  "name": "intent-driven-starter",
+  "description": "A focused Claude Code starter distilled from the tested LocationMaster workflow: repo-aware onboarding, intent-driven execution, minimum-sufficient architecture, context discipline, and deterministic safety.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Mark Kendall"
+  },
+  "repository": "https://github.com/kendallmark3/intent-driven-starter"
+}

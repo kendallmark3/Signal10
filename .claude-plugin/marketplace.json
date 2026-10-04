@@ -1,0 +1,14 @@
+{
+  "name": "kendall-intent-plugins",
+  "owner": {
+    "name": "Mark Kendall"
+  },
+  "description": "Focused Intent-Driven Engineering plugins distilled from tested projects.",
+  "plugins": [
+    {
+      "name": "intent-driven-starter",
+      "source": "./plugins/intent-driven-starter",
+      "description": "Repo-aware intent execution with minimal architecture, disciplined context passing, and optional location-story guidance."
+    }
+  ]
+}
