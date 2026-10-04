@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { rank } from '../src/rank.js';
+import * as ranking from '../src/rank.js';
+
+const { rank, FULL_MATCH_MARGIN } = ranking;
 
 const TOPIC = 'Claude Certified Architect Foundations';
 
@@ -28,7 +30,7 @@ const sibling = (title) => video(title, { views: 5_000_000, ageDays: 10, verifie
 const fullMatches = (count) =>
   Array.from({ length: count }, (_, i) => video(`Claude Certified Architect Foundations lesson ${i} part${i} unit${i}`));
 
-test('a full match ranks above a partial match with a higher score', () => {
+test('a full match ranks above a partial match that outscores it by no more than the margin', () => {
   const results = rank(TOPIC, [
     sibling('Claude Certified Developer Foundations Certification Course'),
     video('Claude Certified Architect Foundations exam walkthrough'),
@@ -38,10 +40,32 @@ test('a full match ranks above a partial match with a higher score', () => {
     'Claude Certified Architect Foundations exam walkthrough',
     'Claude Certified Developer Foundations Certification Course',
   ]);
-  assert.ok(results[1].score > results[0].score, 'the sibling should still score higher on the signals');
+  const gap = results[1].score - results[0].score;
+  assert.ok(gap > 0, 'the sibling should still score higher on the signals');
+  assert.ok(gap <= FULL_MATCH_MARGIN, `fixture gap ${gap} should be within the margin`);
 });
 
-test('with ten or more full matches, no partial match reaches the Top 10', () => {
+test('a full match that scores more than the margin below a partial match ranks below it', () => {
+  const results = rank('Mapbox development', [
+    // Says "development" but is old, short, unwatched and far down YouTube's own results.
+    video('Mapbox development seed demo', { views: 40, ageDays: 3000, durationSeconds: 120, searchPosition: 1 }),
+    video('Building production-ready maps with Mapbox and React', { views: 400_000, ageDays: 20, verified: true, searchPosition: 0 }),
+  ]);
+
+  assert.deepEqual(results.map((r) => r.title), [
+    'Building production-ready maps with Mapbox and React',
+    'Mapbox development seed demo',
+  ]);
+  assert.deepEqual(results[0].missingWords, ['development']);
+  assert.equal(results[0].headline, 'Partial match');
+  assert.ok(results[0].score - results[1].score > FULL_MATCH_MARGIN, 'fixture gap should exceed the margin');
+});
+
+test('the margin is 15 points', () => {
+  assert.equal(FULL_MATCH_MARGIN, 15);
+});
+
+test('with ten or more full matches within the margin, no partial match reaches the Top 10', () => {
   const results = rank(TOPIC, [
     sibling('Claude Certified Developer Foundations Certification Course'),
     sibling('Claude Certified Associate Foundations Exam Prep'),
@@ -52,7 +76,7 @@ test('with ten or more full matches, no partial match reaches the Top 10', () =>
   results.forEach((r) => assert.deepEqual(r.missingWords, []));
 });
 
-test('partial matches fill the remaining places after every full match', () => {
+test('partial matches follow full matches that score within the margin', () => {
   const results = rank(TOPIC, [
     sibling('Claude Certified Developer Foundations Certification Course'),
     ...fullMatches(3),

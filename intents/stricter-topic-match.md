@@ -17,9 +17,9 @@ The topic the user typed, and the candidate videos already gathered for it (titl
 
 ## Success criteria
 
-1. A video whose title and channel cover every topic word is a **full match**. Every full match ranks above every partial match, whatever their scores.
-2. When ten or more full matches are available, no partial match appears in the Top 10.
-3. When fewer than ten full matches are available, partial matches fill the remaining places, after all full matches, in score order.
+1. A video whose title and channel cover every topic word is a **full match**. A full match ranks above a partial match when its score is no more than the margin (15 points) below the partial's. *(Revised 2026-10-04: the first version put every full match first whatever its score, which let weak videos containing a generic topic word, such as "development" in "Mapbox development", displace stronger ones.)*
+2. A full match that scores more than the margin below a partial match ranks below it.
+3. When ten or more full matches score within the margin of the best partial match, no partial match appears in the Top 10. Otherwise partial matches take the places their scores earn under criteria 1 and 2.
 4. A partial match is labelled "Partial match" and its reason names the missing topic words as the user typed them.
 5. A full match carries no partial-match label and lists no missing words.
 6. The channel name counts toward the match, so "AgentCore Runtime" from "AWS Developers" is a full match for "AWS AgentCore".
@@ -35,6 +35,7 @@ The topic the user typed, and the candidate videos already gathered for it (titl
 
 - Tests for each success criterion, committed failing before the implementation.
 - Live searches for "Claude Certified Architect Foundations" and "Test-Driven Development with AI" showing full matches first.
+- A live search for "Mapbox development" showing strong partial matches above weak full matches.
 
 ## Stop condition
 
