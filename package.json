@@ -9,7 +9,8 @@
   },
   "scripts": {
     "start": "node server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "deploy:aws": "node scripts/deploy-aws.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0"

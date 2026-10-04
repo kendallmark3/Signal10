@@ -33,6 +33,18 @@ npm test         # ranking and parsing tests
 
 Open the page, type a topic, and press **Find the Top 10**. Click a video's thumbnail or title to play it in a modal; Close, Esc, or a click outside the modal stops it. A search can also be opened by link: `http://localhost:4310/?topic=AWS%20AgentCore`.
 
+## Deploy to AWS
+
+```bash
+npm run deploy:aws   # creates or updates the site, then prints its HTTPS URL
+```
+
+It needs the AWS CLI, `zip`, and an AWS CLI profile named `mkendall` (set `AWS_PROFILE` to use another). The sign-in credentials and the API key are read from `.env` and sent to AWS as the function's environment.
+
+The site runs as one Lambda function, `signal10`, behind a public Function URL, with the [AWS Lambda Web Adapter](https://github.com/awslabs/aws-lambda-web-adapter) layer in front of the unchanged `server.js`. The first run also creates the execution role `signal10-lambda`. Run the command again after any change; it updates the function in place and the URL stays the same. Changing a credential in `.env` takes effect on the next deploy.
+
+To remove it: `aws lambda delete-function --function-name signal10 --profile mkendall`, then detach the policy from the role and delete the role.
+
 ## What V1 does
 
 The core experience is one flow:
@@ -109,6 +121,9 @@ Each result shows its score, the five signal bars, a one-sentence reason, and wh
 - **Age is approximate in scoring.** Ranking uses YouTube's relative text ("3 weeks ago"); the exact date is fetched only for display.
 - **Some videos will not play in the modal.** Creators can disable playback outside youtube.com; those show YouTube's own message, and the modal's "Open on YouTube" link is the way through.
 - **English, US results only.**
+- **No exact publish dates on AWS.** YouTube's `player` endpoint returns no publish date to requests from AWS addresses, so the deployed site shows only the relative age ("3 weeks ago"). Ranking is unaffected, since it never used the exact date.
+- **The sign-in lockout is per Lambda instance on AWS.** The failed-attempt counter lives in memory, so when Lambda runs more than one instance each keeps its own count, and a new instance starts at zero.
+- **Secrets on AWS are Lambda environment variables.** They are encrypted at rest but readable by anyone with access to the function's configuration in the AWS account.
 
 ## Boundaries
 
@@ -163,6 +178,8 @@ Signal10 follows a progressive-intent approach: get a real V1 running, learn fro
 | [src/learning-path.js](src/learning-path.js) | Title-cue learning-path staging and explanations |
 | [public/index.html](public/index.html) | The single-page interface |
 | [public/login.html](public/login.html) | The sign-in screen |
+| [scripts/deploy-aws.js](scripts/deploy-aws.js) | `npm run deploy:aws`: deploys to AWS Lambda |
+| [run.sh](run.sh) | Lambda entry point; starts `server.js` |
 | [test/](test/) | Tests for ranking, parsing, and learning paths |
 | [DESIGN.md](DESIGN.md) | Design notes for the Intent-Driven Starter plugin |
 | [plugins/intent-driven-starter/](plugins/intent-driven-starter/) | Claude Code plugin: skills, agents, and a secret-scan hook |

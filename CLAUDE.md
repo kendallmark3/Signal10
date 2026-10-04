@@ -16,6 +16,7 @@ Node 20.12+. Run `npm install` once (one dependency: `@anthropic-ai/sdk`). The s
 ```bash
 npm start                                              # http://localhost:4310 (PORT overrides)
 npm test                                               # all tests (node --test)
+npm run deploy:aws                                     # create or update the Lambda deployment (AWS profile mkendall)
 node --test --test-name-pattern="near-duplicate"       # one test by name
 curl -c jar -d "username=$U&password=$P" localhost:4310/login                   # sign in, save the cookie
 curl -b jar -G --data-urlencode "topic=AWS AgentCore" localhost:4310/api/top10  # API without the page
@@ -60,6 +61,8 @@ Things that are easy to get wrong:
 - Every route except `/login` requires a session; the check sits at the top of `createApp` in `server.js`, before any routing. A new route is protected by default; do not add one above that check. `test/protection.test.js` starts the real app on a free port to prove it.
 - `src/auth.js` signs the session with a key derived from the username and password, so there is no session store and changing either credential signs everyone out. `createAuth` throws without both, which is what stops an unprotected start.
 - The session cookie gets `Secure` only when `x-forwarded-proto` is `https`, so it works on local HTTP and behind a TLS-terminating proxy.
+
+- `scripts/deploy-aws.js` deploys to Lambda (`signal10`, us-east-2) behind a Function URL, with the AWS Lambda Web Adapter layer running `run.sh`. App Runner is not open to this account. Only the paths in `BUNDLE` are uploaded, so a new top-level runtime file must be added there. Secrets go to AWS in a file reference, never as CLI arguments.
 
 Known limitations are listed in `README.md`; update that list when one is fixed or a new one is found.
 
