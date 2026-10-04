@@ -22,6 +22,19 @@ curl -G --data-urlencode "topic=AWS AgentCore" localhost:4310/api/top10   # API 
 
 The server does not hot-reload; restart it after editing `server.js` or `src/`. Port 3000 is often taken on this machine, hence 4310.
 
+## How features are built: red commit, then green
+
+Every feature after V1 follows the same sequence, chosen by the repo owner on 2026-10-04:
+
+1. Branch from `main` as `feature/<name>`.
+2. Write the feature intent in `intents/<name>.md`, with numbered success criteria.
+3. Write one failing test per criterion. Run the suite and confirm the new tests fail.
+4. Commit the intent and failing tests alone, with a subject starting `Red:`. This commit is the proof the tests came first.
+5. Implement until the suite passes, run the live searches the intent names as evidence, then commit.
+6. Report anything the live check shows that the criteria did not anticipate; do not quietly widen the feature.
+
+Do not write implementation before the red commit exists, and do not edit a red test to make it pass unless the test itself was wrong (say so in the commit message if it was).
+
 ## Signal10 architecture
 
 One request flows through three files:
@@ -32,6 +45,7 @@ One request flows through three files:
 
 Things that are easy to get wrong:
 
+- `scoreCandidates` sorts full topic matches ahead of partial ones before score, so a higher score does not mean a higher rank across that boundary. `missingWords` on each result drives the "Partial match" chip and reason.
 - Momentum is a percentile within the candidate pool, so a video's score depends on what else the search returned. Scores are not comparable across topics.
 - Scoring uses the approximate age parsed from relative text. The exact `publishedDate` arrives after scoring and is display-only.
 - The reason sentence and the headline chip are generated in `rank.js` from the signals, never by a model. Any future LLM use must not be allowed to produce titles, counts, dates, or links.

@@ -33,6 +33,22 @@ export function topicTokens(topic) {
   return meaningful.length > 0 ? meaningful : all;
 }
 
+// Topic words the text does not mention, in the wording the user typed.
+function missingTopicWords(topic, tokens, text) {
+  const typed = new Map();
+  for (const word of topic.split(/[^A-Za-z0-9+#]+/).filter(Boolean)) {
+    const token = tokenize(word)[0];
+    if (!typed.has(token)) typed.set(token, word);
+  }
+  const have = new Set(tokenize(text));
+  return tokens.filter((t) => !have.has(t)).map((t) => typed.get(t));
+}
+
+const quoteList = (words) => {
+  const quoted = words.map((w) => `“${w}”`);
+  return quoted.length > 1 ? `${quoted.slice(0, -1).join(', ')} or ${quoted.at(-1)}` : quoted[0];
+};
+
 function coverage(wanted, text) {
   if (wanted.length === 0) return 0;
   const have = new Set(tokenize(text));
@@ -98,9 +114,14 @@ function reasonFor(c, tokens) {
     .sort((a, b) => WEIGHTS[b] * signals[b] - WEIGHTS[a] * signals[a]);
   // "posted 2 weeks ago" twice in one sentence reads badly; momentum already says it.
   const picked = ordered.filter((k) => !(k === 'recency' && ordered.includes('momentum'))).slice(0, 3);
-  if (picked.length === 0) return 'One of the closer matches YouTube returned for this topic.';
+  if (picked.length === 0) {
+    return c.missingWords.length > 0
+      ? `The title does not mention ${quoteList(c.missingWords)}, but it is one of the closer matches YouTube returned.`
+      : 'One of the closer matches YouTube returned for this topic.';
+  }
   const sentence = picked.map((k) => phrases[k]).join('; ');
-  return `${sentence[0].toUpperCase()}${sentence.slice(1)}.`;
+  const partial = c.missingWords.length > 0 ? `The title does not mention ${quoteList(c.missingWords)}. ` : '';
+  return `${partial}${sentence[0].toUpperCase()}${sentence.slice(1)}.`;
 }
 
 export function scoreCandidates(topic, candidates) {
@@ -121,6 +142,7 @@ export function scoreCandidates(topic, candidates) {
       // Title plus channel, so "AgentCore Runtime" from AWS Developers counts as "AWS AgentCore".
       const headCoverage = coverage(tokens, `${c.title} ${c.channel}`);
       const anyCoverage = coverage(tokens, `${c.title} ${c.snippet} ${c.channel}`);
+      const missingWords = missingTopicWords(topic, tokens, `${c.title} ${c.channel}`);
       const channelCount = channelCounts.get(c.channel);
       const pace = viewsPerDay(c);
       const signals = {
@@ -132,9 +154,16 @@ export function scoreCandidates(topic, candidates) {
         authority: Math.min(1, (c.verified ? 0.7 : 0.3) + (channelCount > 1 ? 0.3 : 0)),
       };
       const score = Object.entries(WEIGHTS).reduce((sum, [k, w]) => sum + w * signals[k], 0);
-      return { ...c, headCoverage, channelCount, viewsPerDay: pace, signals, score: Math.round(score * 100) };
+      return { ...c, headCoverage, missingWords, channelCount, viewsPerDay: pace, signals, score: Math.round(score * 100) };
     })
-    .sort((a, b) => b.score - a.score || (b.views ?? 0) - (a.views ?? 0))
+    // Full matches first: a video missing a topic word is usually about a neighbouring subject,
+    // and strong momentum should not let it outrank one that is on the topic.
+    .sort(
+      (a, b) =>
+        Math.sign(a.missingWords.length) - Math.sign(b.missingWords.length) ||
+        b.score - a.score ||
+        (b.views ?? 0) - (a.views ?? 0),
+    )
     .map((c) => ({ ...c, tokens }));
 }
 
@@ -168,7 +197,7 @@ export function present(picked) {
       ...c,
       rank: index + 1,
       rankByViews: byViews.findIndex((v) => v.id === c.id) + 1,
-      headline: LABELS[strongest],
+      headline: c.missingWords.length > 0 ? 'Partial match' : LABELS[strongest],
       reason: reasonFor(full, tokens),
     };
   });
