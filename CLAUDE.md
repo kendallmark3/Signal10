@@ -45,7 +45,7 @@ One request flows through three files:
 
 Things that are easy to get wrong:
 
-- `scoreCandidates` sorts full topic matches ahead of partial ones before score, so a higher score does not mean a higher rank across that boundary. `missingWords` on each result drives the "Partial match" chip and reason.
+- `scoreCandidates` orders by score plus `FULL_MATCH_MARGIN` (15) for full topic matches, so list order does not follow the displayed `score` across the full/partial boundary. `missingWords` on each result drives the "Partial match" chip and reason. The margin was tuned against live searches; changing it trades the "Claude Certified Architect Foundations" result against "Mapbox development".
 - Momentum is a percentile within the candidate pool, so a video's score depends on what else the search returned. Scores are not comparable across topics.
 - Scoring uses the approximate age parsed from relative text. The exact `publishedDate` arrives after scoring and is display-only.
 - The reason sentence and the headline chip are generated in `rank.js` from the signals, never by a model. Any future LLM use must not be allowed to produce titles, counts, dates, or links.

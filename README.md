@@ -72,7 +72,7 @@ Signal10 runs the topic through three YouTube searches (all time, this year, thi
 | Freshness | 15% | Age, halving in value each year |
 | Channel | 10% | Verified badge, and whether the channel has several videos on the topic |
 
-Videos whose title and channel mention every topic word are full matches and always rank above partial matches, so a popular video on a neighbouring subject cannot lead the list. Partial matches only fill places that full matches leave open, and each is labelled with the topic words it does not mention.
+Videos whose title and channel mention every topic word are full matches. A full match gets a 15-point head start when the list is ordered, so a popular video on a neighbouring subject cannot lead the list, while a much stronger partial match can still rank above a weak full one. Each partial match is labelled with the topic words it does not mention. The score shown on a card is the raw score, without the head start, so a lower-scoring full match can sit above a higher-scoring partial one.
 
 Lifetime views are never scored directly. Videos under one minute, live streams in progress, and videos matching less than half the topic's words are dropped. Near-duplicate titles collapse to one result, and no channel takes more than two places.
 
@@ -83,7 +83,7 @@ Each result shows its score, the five signal bars, a one-sentence reason, and wh
 - **No API key means an unofficial data source.** Results come from the same public endpoints youtube.com uses. YouTube can change or rate-limit them without notice, and a hosted deployment should move to the YouTube Data API.
 - **No engagement signal.** Likes and comment counts are not in search results, so momentum stands in for audience response.
 - **Topic match is word-based.** A video counts as a full match only if its title or channel contains every topic word. Abbreviations and word forms are not understood, so "AI TDD" is a partial match for "Test-Driven Development with AI", and "retire" does not match "retirement". Nothing judges what a video actually teaches.
-- **Full matches always come first, even weak ones.** For a topic with a generic word, such as "Mapbox development", a low-scoring video that happens to say "development" ranks above stronger Mapbox videos that do not.
+- **The full-match head start is a fixed 15 points.** It is a compromise: large enough to push sibling certifications down the "Claude Certified Architect Foundations" list, but one still appears at #10, and in "Mapbox development" a weak video that says "development" still sits mid-list above a few stronger ones.
 - **Learning-path stages are title-based clues.** A title can suggest an introduction, advanced treatment, or practice without proving what the video covers; check the video itself. Videos whose titles carry no such wording stay in the core stage, ordered shortest first.
 - **Depth is length.** A long video scores as deep whether or not it is.
 - **Freshness is always on.** It applies the same weight to "Retirement investing" as to a fast-moving technology topic.

@@ -15,6 +15,8 @@ const MIN_TOPIC_COVERAGE = 0.5;
 const DUPLICATE_TITLE_SIMILARITY = 0.75;
 const MAX_PER_CHANNEL = 2;
 const RECENCY_HALF_LIFE_DAYS = 365;
+// How many score points a full topic match is worth over a partial one when ordering.
+export const FULL_MATCH_MARGIN = 15;
 
 const STOPWORDS = new Set([
   'a', 'an', 'the', 'of', 'to', 'for', 'with', 'and', 'or', 'in', 'on', 'at', 'by', 'from',
@@ -124,6 +126,9 @@ function reasonFor(c, tokens) {
   return `${partial}${sentence[0].toUpperCase()}${sentence.slice(1)}.`;
 }
 
+// Ties go to the full match, so a gap of exactly the margin still favours it.
+const orderingScore = (c) => c.score + (c.missingWords.length === 0 ? FULL_MATCH_MARGIN + 0.5 : 0);
+
 export function scoreCandidates(topic, candidates) {
   const tokens = topicTokens(topic);
   const usable = candidates.filter(
@@ -156,14 +161,10 @@ export function scoreCandidates(topic, candidates) {
       const score = Object.entries(WEIGHTS).reduce((sum, [k, w]) => sum + w * signals[k], 0);
       return { ...c, headCoverage, missingWords, channelCount, viewsPerDay: pace, signals, score: Math.round(score * 100) };
     })
-    // Full matches first: a video missing a topic word is usually about a neighbouring subject,
-    // and strong momentum should not let it outrank one that is on the topic.
-    .sort(
-      (a, b) =>
-        Math.sign(a.missingWords.length) - Math.sign(b.missingWords.length) ||
-        b.score - a.score ||
-        (b.views ?? 0) - (a.views ?? 0),
-    )
+    // A video missing a topic word is usually about a neighbouring subject, so full matches
+    // get a head start. It is capped: a weak video that merely contains a generic topic word
+    // should not displace a much stronger one.
+    .sort((a, b) => orderingScore(b) - orderingScore(a) || b.score - a.score || (b.views ?? 0) - (a.views ?? 0))
     .map((c) => ({ ...c, tokens }));
 }
 
