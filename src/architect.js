@@ -1,6 +1,6 @@
 // Architect View: one Claude call that turns Signal10's ranked results into an
-// architecture-oriented learning plan. The model only reasons; every video shown to the
-// user is resolved from Signal10's own results, so the reply cannot introduce a title or link.
+// architecture-oriented learning plan. The model only reasons; every video and book shown to
+// the user is resolved from Signal10's own results, so the reply cannot introduce a title or link.
 import Anthropic from '@anthropic-ai/sdk';
 
 const MODEL = 'claude-opus-5-5';
@@ -40,6 +40,11 @@ Produce a concise plan the architect can scan in under a minute:
 
 Keep every list to at most five items and every item to one short sentence or phrase. The concepts, implications and risks come from your own knowledge of the topic; if the topic is newer than your knowledge or you are unsure, say so plainly in the summary instead of guessing.`;
 
+// Added to the system prompt only when Signal10 found free books for the topic.
+const READING_NOTE = `
+
+You are also given a short reading list: free books a catalogue search found for the same topic. For each you see only its number, title, author, first publication year and how it can be read. You have not read them, and the search is loose, so some may be dated or beside the point. A step in the sequence is either a video (step "watch", rank = the video's rank) or a book (step "read", rank = the book's number). Add a book only where reading it at that point clearly helps this architect, say in one sentence why it belongs there, and mention it if the book is old enough to be out of date. Using no books is a good answer when none fit. Never refer to a book that is not on the list.`;
+
 const stringList = { type: 'array', items: { type: 'string' } };
 const videoRefs = {
   type: 'array',
@@ -50,11 +55,21 @@ const videoRefs = {
     additionalProperties: false,
   },
 };
+// A step is a video to watch or a book to read; rank is the video's rank or the book's number.
+const steps = {
+  type: 'array',
+  items: {
+    type: 'object',
+    properties: { step: { type: 'string', enum: ['watch', 'read'] }, rank: { type: 'integer' }, why: { type: 'string' } },
+    required: ['step', 'rank', 'why'],
+    additionalProperties: false,
+  },
+};
 const VIEW_SCHEMA = {
   type: 'object',
   properties: {
     summary: { type: 'string' },
-    sequence: videoRefs,
+    sequence: steps,
     prerequisites: stringList,
     skip: videoRefs,
     keyConcepts: stringList,
@@ -76,7 +91,12 @@ const brief = (results) =>
     published: r.publishedText,
   }));
 
-export function buildRequest(topic, results) {
+// The same economy for books: enough to judge where one fits, and no links or covers.
+const readingBrief = (reading) =>
+  reading.map((b) => ({ number: b.number, title: b.subtitle ? `${b.title}: ${b.subtitle}` : b.title, author: b.authors, firstPublished: b.year, availability: b.accessLabel }));
+
+export function buildRequest(topic, results, reading = []) {
+  const books = reading.length > 0 ? `\n\nReading list:\n${JSON.stringify(readingBrief(reading), null, 1)}` : '';
   return {
     model: MODEL,
     max_tokens: 16000,
@@ -85,9 +105,9 @@ export function buildRequest(topic, results) {
     fallbacks: 'default',
     thinking: { type: 'adaptive' },
     output_config: { effort: 'medium', format: { type: 'json_schema', schema: VIEW_SCHEMA } },
-    system: SYSTEM,
+    system: reading.length > 0 ? SYSTEM + READING_NOTE : SYSTEM,
     messages: [
-      { role: 'user', content: `Topic: ${topic}\n\nRanked videos:\n${JSON.stringify(brief(results), null, 1)}` },
+      { role: 'user', content: `Topic: ${topic}\n\nRanked videos:\n${JSON.stringify(brief(results), null, 1)}${books}` },
     ],
   };
 }
@@ -118,10 +138,32 @@ function resolveVideos(entries, byRank, taken) {
   return resolved;
 }
 
-export function interpret(reply, results) {
+// The sequence may mix videos and books. A "read" step is resolved by number from Signal10's
+// own reading list, exactly as a video is by rank; a step with no kind is a video.
+function resolveSteps(entries, byRank, taken, reading) {
+  const byNumber = new Map(reading.map((b) => [b.number, b]));
+  const read = new Set();
+  const resolved = [];
+  for (const entry of Array.isArray(entries) ? entries : []) {
+    if (entry?.step !== 'read') {
+      resolved.push(...resolveVideos([entry], byRank, taken));
+      continue;
+    }
+    const book = byNumber.get(entry.rank);
+    if (!book || read.has(book.number)) continue;
+    read.add(book.number);
+    resolved.push({
+      reading: { number: book.number, title: book.title, authors: book.authors, year: book.year, access: book.access, accessLabel: book.accessLabel, url: book.url },
+      why: text(entry.why),
+    });
+  }
+  return resolved;
+}
+
+export function interpret(reply, results, reading = []) {
   const byRank = new Map(results.map((r) => [r.rank, r]));
   const taken = new Set();
-  const sequence = resolveVideos(reply?.sequence, byRank, taken);
+  const sequence = resolveSteps(reply?.sequence, byRank, taken, reading);
   if (sequence.length === 0) throw new ArchitectError('failed', MESSAGES.failed);
 
   return {
@@ -147,17 +189,17 @@ function toArchitectError(err) {
 }
 
 // `client` is an Anthropic SDK client, or null when no API key is configured.
-export async function architectView(topic, results, { client }) {
+export async function architectView(topic, results, { client, reading = [] }) {
   if (!client) throw new ArchitectError('not_configured', MESSAGES.not_configured);
   if (results.length === 0) throw new ArchitectError('failed', MESSAGES.no_results);
 
   try {
-    const response = await client.beta.messages.create(buildRequest(topic, results));
+    const response = await client.beta.messages.create(buildRequest(topic, results, reading));
     if (response.stop_reason === 'refusal') throw new ArchitectError('refused', MESSAGES.refused);
     if (response.stop_reason !== 'end_turn') throw new ArchitectError('failed', MESSAGES.failed);
 
     const reply = response.content.find((block) => block.type === 'text');
-    return interpret(JSON.parse(reply?.text ?? ''), results);
+    return interpret(JSON.parse(reply?.text ?? ''), results, reading);
   } catch (err) {
     throw toArchitectError(err);
   }

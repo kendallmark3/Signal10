@@ -109,6 +109,17 @@
   @keyframes spin { to { transform: rotate(360deg); } }
   @media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 3s; } }
   .arch-summary { font-size: 1.05rem; }
+  .arch-step { margin-right: 6px; color: var(--accent); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+  .reading { margin-top: 24px; padding: 16px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+  .reading h2 { margin: 0 0 12px; font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .reading p { margin: 0; color: var(--muted); }
+  .reading ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 14px; }
+  .book { display: flex; gap: 12px; align-items: flex-start; }
+  .book img, .book .no-cover { flex: none; width: 48px; height: 72px; object-fit: cover; border-radius: 4px; background: var(--bar); }
+  .book a { font-weight: 600; color: inherit; text-decoration: none; overflow-wrap: anywhere; }
+  .book a:hover { text-decoration: underline; }
+  .book .meta { display: block; color: var(--muted); font-size: 0.85rem; }
+  .book .headline { display: inline-block; margin-top: 4px; }
   .arch-video { font-weight: 600; color: inherit; text-decoration: none; overflow-wrap: anywhere; }
   .arch-video:hover { text-decoration: underline; }
   .arch-meta { display: block; color: var(--muted); font-size: 0.85rem; }
@@ -152,6 +163,7 @@
   </div>
   <ol id="results"></ol>
   <section id="architect" aria-label="Architect View" hidden></section>
+  <section id="reading" class="reading" aria-label="Free reading" hidden></section>
 
   <footer id="footer" hidden>
     Ranked on topic match, views per day since posting, depth, freshness and channel standing.
@@ -186,6 +198,7 @@ const footer = document.getElementById('footer');
 const suggestion = document.getElementById('suggestion');
 const suggested = document.getElementById('suggested');
 const recentRow = document.getElementById('recent');
+const readingPanel = document.getElementById('reading');
 const viewSwitch = document.getElementById('view-switch');
 const top10Button = document.getElementById('show-top10');
 const pathButton = document.getElementById('show-path');
@@ -307,8 +320,38 @@ function archBlock(title, children) {
 
 const archList = (items) => el('ul', {}, items.map((item) => el('li', { textContent: item })));
 
-function archVideos(entries, ordered) {
-  return el(ordered ? 'ol' : 'ul', {}, entries.map(({ video, why }) => el('li', {}, [
+const bookLine = (book) => [book.authors, book.year ? `First published ${book.year}` : null].filter(Boolean).join(' · ');
+
+// Free books from Open Library for the same topic. Titles and authors are untrusted text,
+// so everything is set with textContent; the link is built by the server from the work id.
+function showReading(books) {
+  const rows = books.map((book) => el('li', { className: 'book' }, [
+    book.cover
+      ? el('img', { src: book.cover, alt: '', loading: 'lazy', referrerPolicy: 'no-referrer' })
+      : el('span', { className: 'no-cover', ariaHidden: 'true' }),
+    el('div', {}, [
+      el('a', { href: book.url, target: '_blank', rel: 'noopener', textContent: book.subtitle ? `${book.title}: ${book.subtitle}` : book.title }),
+      el('span', { className: 'meta', textContent: [bookLine(book), book.type].filter(Boolean).join(' · ') }),
+      el('span', { className: 'headline', textContent: book.accessLabel }),
+    ]),
+  ]));
+  readingPanel.replaceChildren(
+    el('h2', { textContent: 'Free reading from Open Library' }),
+    rows.length > 0 ? el('ul', {}, rows) : el('p', { textContent: 'No free book on Open Library matched this topic closely.' }),
+  );
+  readingPanel.hidden = false;
+}
+
+// A step is a video from the Top 10 or a book from the reading list; `labelled` marks which.
+function archVideos(entries, ordered, labelled = false) {
+  const label = (text) => (labelled ? [el('span', { className: 'arch-step', textContent: text })] : []);
+  return el(ordered ? 'ol' : 'ul', {}, entries.map(({ video, reading, why }) => el('li', {}, reading ? [
+    ...label('Read'),
+    el('a', { href: reading.url, target: '_blank', rel: 'noopener', className: 'arch-video', textContent: reading.title }),
+    el('span', { className: 'arch-meta', textContent: [bookLine(reading), reading.accessLabel].filter(Boolean).join(' · ') }),
+    el('div', { textContent: why }),
+  ] : [
+    ...label('Watch'),
     el('a', { href: video.url, target: '_blank', rel: 'noopener', className: 'arch-video', textContent: video.title, onclick: playOnClick(video) }),
     el('span', { className: 'arch-meta', textContent: `${video.channel} · ${video.durationText} · #${video.rank} in the Top 10` }),
     el('div', { textContent: why }),
@@ -319,7 +362,9 @@ function renderArchitect(view) {
   const optional = (title, items) => (items.length > 0 ? [archBlock(title, [archList(items)])] : []);
   architectPanel.replaceChildren(
     archBlock('In short', [el('p', { className: 'arch-summary', textContent: view.summary })]),
-    archBlock('Watch in this order', [archVideos(view.sequence, true)]),
+    view.sequence.some((step) => step.reading)
+      ? archBlock('Watch and read in this order', [archVideos(view.sequence, true, true)])
+      : archBlock('Watch in this order', [archVideos(view.sequence, true)]),
     el('div', { className: 'arch-pair' }, [
       ...optional('Before you start', view.prerequisites),
       ...optional('Key concepts', view.keyConcepts),
@@ -388,7 +433,8 @@ async function showArchitect() {
   }
   status.textContent = `Architect View for “${search.topic}”.`;
   renderArchitect(result.view);
-  footer.textContent = 'Architect View is written by Claude from the titles, channels and lengths of the Top 10 and its own knowledge of the topic. It has not watched the videos.';
+  footer.textContent = 'Architect View is written by Claude from the titles, channels and lengths of the Top 10 and its own knowledge of the topic. It has not watched the videos'
+    + (search.reading?.length > 0 ? ' or read the books; the reading list comes from Open Library.' : '.');
   footer.hidden = false;
 }
 
@@ -400,6 +446,7 @@ async function run(topic) {
   viewSwitch.hidden = true;
   footer.hidden = true;
   suggestion.hidden = true;
+  readingPanel.hidden = true;
   searchResults = null;
   architectResult = null;
   architectRequest = null;
@@ -416,6 +463,7 @@ async function run(topic) {
       suggested.textContent = data.suggestion;
       suggestion.hidden = false;
     }
+    showReading(data.reading ?? []);
     if (data.results.length === 0) {
       status.textContent = `No videos matched “${topic}” closely enough. Try a broader or differently worded topic.`;
       return;

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { gatherCandidates, isAvailable, fetchPublishDate } from './src/youtube.js';
 import { scoreCandidates, pickDiverse, present } from './src/rank.js';
 import { buildLearningPath } from './src/learning-path.js';
+import { findReading } from './src/openlibrary.js';
 import { architectView, ArchitectError } from './src/architect.js';
 import { createAuth } from './src/auth.js';
 import Anthropic from '@anthropic-ai/sdk';
@@ -55,13 +56,16 @@ async function architect(topic) {
     remember(topic, await top10(topic));
     entry = recent.get(topicKey(topic));
   }
-  entry.view ??= await architectView(entry.data.topic, entry.data.results, { client: anthropic });
+  entry.view ??= await architectView(entry.data.topic, entry.data.results, { client: anthropic, reading: entry.data.reading });
   return { topic: entry.data.topic, view: entry.view };
 }
 
 const ARCHITECT_STATUS = { not_configured: 503, refused: 422, failed: 502 };
 
 export async function top10(topic) {
+  // Started alongside the YouTube searches and collected at the end. It never rejects, so
+  // a slow or failed Open Library costs the videos nothing.
+  const reading = findReading(topic);
   const { candidates, suggestion } = await gatherCandidates(topic);
   const scored = scoreCandidates(topic, candidates);
   const shortlist = pickDiverse(scored, LIMIT + SPARES);
@@ -78,6 +82,7 @@ export async function top10(topic) {
     candidatesOnTopic: scored.length,
     results,
     learningPath: buildLearningPath(results),
+    reading: await reading,
   };
 }
 

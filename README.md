@@ -105,6 +105,10 @@ Lifetime views are never scored directly. Videos under one minute, live streams 
 
 Each result shows its score, the five signal bars, a one-sentence reason, and where it would sit if the same ten were sorted by views alone.
 
+## Free reading
+
+Each search also asks [Open Library](https://openlibrary.org) for books on the same topic and lists up to five under the videos. A book is shown only if Open Library says it can be read for free, and the label says which kind: **Free to read online**, or **Free to borrow with an Open Library account**. Every link goes to the book's own Open Library page. Architect View receives the same short list and may place a book in its sequence as a Read step between videos; it may also use none.
+
 ## Known limitations
 
 - **Architect View has not watched the videos.** Claude sees only each video's rank, title, channel, length and age, and adds its own knowledge of the topic. Its concepts, implications and risks can be out of date for a new technology, and its guesses about what a video covers can be wrong. Every video it names is one of Signal10's Top 10; it cannot add others.
@@ -121,6 +125,10 @@ Each result shows its score, the five signal bars, a one-sentence reason, and wh
 - **Age is approximate in scoring.** Ranking uses YouTube's relative text ("3 weeks ago"); the exact date is fetched only for display.
 - **Some videos will not play in the modal.** Creators can disable playback outside youtube.com; those show YouTube's own message, and the modal's "Open on YouTube" link is the way through.
 - **English, US results only.**
+- **Free reading is thin for new technology.** Open Library has no free copy of most recent technical books, so topics such as "Agentic Workflows", "Kubernetes" or "AWS AgentCore" get no reading at all, and what does appear is often ten or more years old. Established subjects (Python, machine learning, retirement investing) do much better.
+- **Most free reading is borrow, not open.** Books that anyone can read without an account are rare; most results need a free Open Library account to borrow, and a borrowed copy can have a waiting list. The label on each book says which it is.
+- **A book must name the topic in its title.** Every word of the topic has to appear in the title or subtitle. That keeps out loose matches (The Time Machine for "machine learning") and also keeps out good books with different wording.
+- **Nobody has read the books.** Signal10 does not open them and Claude judges them from title, author and year alone.
 - **Recent searches live in one browser.** The five most recent are kept in that browser's local storage, so they do not follow you to another device or browser, and a private window forgets them.
 - **A misspelled search is searched as typed.** "Did you mean" is YouTube's own correction, offered beside the results and never applied. The typed phrase is still what Signal10 matches titles against, so a misspelling usually returns fewer results until the suggestion is clicked. The misspelled phrase is also kept in Recent.
 - **Typo help depends on YouTube.** When YouTube offers no correction, Signal10 suggests nothing; it has no dictionary of its own.
@@ -179,6 +187,7 @@ Signal10 follows a progressive-intent approach: get a real V1 running, learn fro
 | [src/auth.js](src/auth.js) | Sign-in: credential check, signed session, lockout |
 | [src/youtube.js](src/youtube.js) | Fetches and parses real video metadata from YouTube |
 | [src/rank.js](src/rank.js) | Scoring, de-duplication, and explanations |
+| [src/openlibrary.js](src/openlibrary.js) | Finds free books for the topic on Open Library |
 | [src/learning-path.js](src/learning-path.js) | Title-cue learning-path staging and explanations |
 | [public/index.html](public/index.html) | The single-page interface |
 | [public/recent.js](public/recent.js) | Recent searches: the list rules and local-storage handling |

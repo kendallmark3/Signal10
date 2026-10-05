@@ -69,6 +69,9 @@ Things that are easy to get wrong:
 - `public/recent.js` is the one script shared by the browser and the tests: the page imports it from `/recent.js` (served behind the session check) and `test/recent.test.js` imports the same file. The page's own script is `type="module"` for that import.
 - "Did you mean" is YouTube's correction (`correctionFrom` in `src/youtube.js`), read from the search replies already being fetched. `gatherCandidates` returns `{ candidates, suggestion }`. The suggestion is offered, never applied: the typed topic is what gets scored.
 
+- `src/openlibrary.js` is the only code that talks to Open Library: one keyless search per topic, filtered to books that are `public` or `borrowable`, in English, with every topic word in the title. `findReading` never rejects, and `top10()` starts it beside the YouTube searches, so Open Library cannot fail or slow a video search. Its word list (`FILLER`) is deliberately not `rank.js`'s `STOPWORDS`: "learning" is filler for videos and half of "machine learning" for books.
+- Architect View's `sequence` is a list of steps, each `watch` (a video rank) or `read` (a reading-list number). Books follow the same boundary as videos: the request carries number, title, author, year and availability; `interpret` resolves a read step from Signal10's own list. With no books the request is byte-for-byte what it was before.
+
 Known limitations are listed in `README.md`; update that list when one is fixed or a new one is found.
 
 ## Source of truth for Signal10
