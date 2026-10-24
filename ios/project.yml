@@ -45,11 +45,23 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         TEST_HOST: $(BUILT_PRODUCTS_DIR)/Signal10.app/Signal10
         BUNDLE_LOADER: $(TEST_HOST)
+  Signal10UITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [Signal10UITests]
+    dependencies:
+      - target: Signal10
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kendallsoft.Signal10UITests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: Signal10
 schemes:
   Signal10:
     build:
       targets:
         Signal10: all
         Signal10Tests: [test]
+        Signal10UITests: [test]
     test:
-      targets: [Signal10Tests]
+      targets: [Signal10Tests, Signal10UITests]

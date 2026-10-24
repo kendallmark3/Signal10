@@ -33,6 +33,10 @@ npm test         # ranking and parsing tests
 
 Open the page, type a topic, and press **Find the Top 10**. Click a video's thumbnail or title to play it in a modal; Close, Esc, or a click outside the modal stops it. A search can also be opened by link: `http://localhost:4310/?topic=AWS%20AgentCore`.
 
+## iPhone app
+
+`ios/` holds a native SwiftUI app that uses this server's `/login`, `/api/top10` and `/api/architect` routes and adds nothing to the ranking. It turns the learning path into a sequence you work through, remembering what you have watched. Build and run steps are in [ios/README.md](ios/README.md).
+
 ## Deploy to AWS
 
 ```bash
@@ -196,6 +200,7 @@ Signal10 follows a progressive-intent approach: get a real V1 running, learn fro
 | [scripts/deploy-aws.js](scripts/deploy-aws.js) | `npm run deploy:aws`: deploys to AWS Lambda |
 | [run.sh](run.sh) | Lambda entry point; starts `server.js` |
 | [test/](test/) | Tests for ranking, parsing, and learning paths |
+| [ios/](ios/) | The native iPhone app and its tests |
 | [DESIGN.md](DESIGN.md) | Design notes for the Intent-Driven Starter plugin |
 | [plugins/intent-driven-starter/](plugins/intent-driven-starter/) | Claude Code plugin: skills, agents, and a secret-scan hook |
 | [.claude-plugin/](.claude-plugin/) | Marketplace definition for the plugin |

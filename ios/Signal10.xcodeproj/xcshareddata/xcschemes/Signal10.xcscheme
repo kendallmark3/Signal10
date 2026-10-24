@@ -35,6 +35,20 @@
                ReferencedContainer = "container:Signal10.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "EB70760CFE7CC7AC213A6E53"
+               BuildableName = "Signal10UITests.xctest"
+               BlueprintName = "Signal10UITests"
+               ReferencedContainer = "container:Signal10.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -61,6 +75,17 @@
                BlueprintIdentifier = "78B6FCC370A8808DB2E38B2C"
                BuildableName = "Signal10Tests.xctest"
                BlueprintName = "Signal10Tests"
+               ReferencedContainer = "container:Signal10.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "EB70760CFE7CC7AC213A6E53"
+               BuildableName = "Signal10UITests.xctest"
+               BlueprintName = "Signal10UITests"
                ReferencedContainer = "container:Signal10.xcodeproj">
             </BuildableReference>
          </TestableReference>

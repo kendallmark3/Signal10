@@ -72,6 +72,8 @@ Things that are easy to get wrong:
 - `src/openlibrary.js` is the only code that talks to Open Library: one keyless search per topic, filtered to books that are `public` or `borrowable`, in English, with every topic word in the title. `findReading` never rejects, and `top10()` starts it beside the YouTube searches, so Open Library cannot fail or slow a video search. Its word list (`FILLER`) is deliberately not `rank.js`'s `STOPWORDS`: "learning" is filler for videos and half of "machine learning" for books.
 - Architect View's `sequence` is a list of steps, each `watch` (a video rank) or `read` (a reading-list number). Books follow the same boundary as videos: the request carries number, title, author, year and availability; `interpret` resolves a read step from Signal10's own list. With no books the request is byte-for-byte what it was before.
 
+- `ios/` is a SwiftUI client of the same routes; it holds no ranking logic, model name or key, only the server address (`ios/Config/*.xcconfig`). Its models mirror the JSON from `server.js` and `src/`, so renaming or removing a field in `top10()`, `present()`, `buildLearningPath()`, `selectReading()` or `interpret()` breaks the app: update `ios/Signal10/Core/Models.swift` and re-record `ios/Signal10Tests/Fixtures/top10-swift-concurrency.json`. The Xcode project is generated from `ios/project.yml` by `xcodegen` and committed. Unit tests: `xcodebuild test -project ios/Signal10.xcodeproj -scheme Signal10 -destination 'platform=iOS Simulator,name=iPhone 17 Pro'`; the UI test needs a server and credentials (see `ios/README.md`).
+
 Known limitations are listed in `README.md`; update that list when one is fixed or a new one is found.
 
 ## Source of truth for Signal10
