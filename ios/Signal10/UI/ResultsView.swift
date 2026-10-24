@@ -8,7 +8,7 @@ struct ResultsView: View {
     private enum Mode: String, CaseIterable { case path = "Learning path", ranking = "Top 10" }
 
     @State private var phase = Phase.loading
-    @State private var mode = Mode.path
+    @State private var mode = AppSettings().startView == .ranking ? Mode.ranking : Mode.path
     @State private var playing: PathStep?
     @State private var showArchitect = false
 
@@ -212,6 +212,10 @@ struct ResultsView: View {
         let watched = app.isWatched(video.id, topic: topic)
         Button(watched ? "Mark as not watched" : "Mark as watched", systemImage: watched ? "circle" : "checkmark.circle") {
             app.setWatched(!watched, videoID: video.id, topic: topic)
+        }
+        let favorite = app.isFavorite(video.id)
+        Button(favorite ? "Remove from favorites" : "Add to favorites", systemImage: favorite ? "star.slash" : "star") {
+            app.toggleFavorite(video, topic: topic)
         }
         Link(destination: video.url) { Label("Open on YouTube", systemImage: "arrow.up.right.square") }
     }

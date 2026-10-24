@@ -6,6 +6,16 @@ A native SwiftUI client for the Signal10 server in this repository. It asks "Wha
 | --- | --- | --- | --- |
 | ![Home](docs/screenshots/01-home.png) | ![Results](docs/screenshots/03-results.png) | ![Player](docs/screenshots/05-player.png) | ![Up next moves on](docs/screenshots/07-continue.png) |
 
+| Favorites | Settings | Help |
+| --- | --- | --- |
+| ![Favorites on Home](docs/screenshots/10-home-favorites.png) | ![Settings](docs/screenshots/13-settings.png) | ![Help](docs/screenshots/15-help.png) |
+
+## On the device
+
+- **Favorites.** The star on the player, or a long press on any video, saves it. Favorites appear on Home; tap one to play it, swipe to remove it. ([intents/ios-settings-favorites.md](../intents/ios-settings-favorites.md))
+- **Settings** (gear on Home): open results in the Learning path or the Top 10; autoplay videos on or off; clear recent searches, watched progress or favorites; the server in use and Sign out; version, Help and the developer credit.
+- **Help** (question mark on Home, or Settings › Help and how-to): how to use the app, the five ranking signals, the four path stages, Architect View and tips. Its signal and stage names are the server's own labels, checked by a unit test.
+
 ## How it fits
 
 The app holds no Signal10 logic of its own. Searching, ranking, de-duplication, reasons, learning-path stages, free reading and Architect View all come from the server, through the same routes the web page uses:
@@ -17,7 +27,7 @@ The app holds no Signal10 logic of its own. Searching, ranking, de-duplication, 
 | `GET /api/architect?topic=` | Architect View, fetched only when the user opens it |
 | `POST /logout` | Sign out |
 
-The app compiles in only the server's address. It holds no API key, no model name and no provider: the server owns the model call, so the server can change models or providers without an app update. The password is sent to the server once and is not stored. Watched videos and the five recent searches are kept on the device.
+The app compiles in only the server's address. It holds no API key, no model name and no provider: the server owns the model call, so the server can change models or providers without an app update. The password is sent to the server once and is not stored. Watched videos, favorites, settings and the five recent searches are kept on the device.
 
 Videos play in YouTube's own embedded player (`youtube-nocookie.com`, as on the web page), with "Open on YouTube" for creators who turn off embedding.
 
@@ -50,13 +60,13 @@ If you redeploy to a new URL, update `SIGNAL10_BASE_URL` in `Release.xcconfig`.
 
 ## Tests
 
-Unit tests (decoding real replies, sign-in, error handling, recent searches, progress, player safety, no secrets in settings) need no server:
+Unit tests (decoding real replies, sign-in, error handling, recent searches, progress, favorites, settings, clearing data, help labels, player safety, no secrets in settings) need no server:
 
 ```bash
 xcodebuild test -project ios/Signal10.xcodeproj -scheme Signal10 -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
 ```
 
-The end-to-end UI test (`Signal10UITests`) signs in, searches, plays step 1, marks it watched and checks that "Up next" moves on, saving a screenshot at each step. It is skipped unless credentials are supplied, and they are only ever read from the environment:
+The end-to-end UI tests (`Signal10UITests`) sign in, search, play step 1, mark it watched and check that "Up next" moves on; and star a video, play it from Favorites, and open Settings and Help. They save a screenshot at each step. It is skipped unless credentials are supplied, and they are only ever read from the environment:
 
 ```bash
 TEST_RUNNER_SIGNAL10_USERNAME=you TEST_RUNNER_SIGNAL10_PASSWORD=secret TEST_RUNNER_SIGNAL10_SCREENSHOT_DIR=/tmp/shots xcodebuild test -project ios/Signal10.xcodeproj -scheme Signal10 -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -only-testing:Signal10UITests SIGNAL10_BASE_URL=http://localhost:4310
@@ -70,16 +80,18 @@ Add `TEST_RUNNER_SIGNAL10_TOPIC="Swift concurrency"` to search something other t
 | --- | --- |
 | `project.yml` | XcodeGen source for the project |
 | `Config/` | The server address per configuration |
-| `Signal10/Core/` | Reply models, the server client, topic rules, recent searches, watched progress, the embed URL |
+| `Signal10/Core/` | Reply models, the server client, topic rules, recent searches, watched progress, the embed URL, favorites, settings, help text |
 | `Signal10/App/` | App-wide state |
-| `Signal10/UI/` | Home, results, player, Architect View, sign-in |
+| `Signal10/UI/` | Home, results, player, Architect View, sign-in, favorites, settings, help |
 | `Signal10Tests/` | Unit tests and recorded server replies |
 | `Signal10UITests/` | The end-to-end flow |
 
 ## Known limitations
 
 - **Sign-in is the server's shared username and password.** Fine for the owner and testers; public App Store users will need real accounts or no sign-in, which is a server change first.
+- **Favorites live on one device**, like watched progress. They are not synced or backed up separately, and Clear favorites cannot be undone.
+- **A favorite keeps the details from when it was saved.** If the creator later renames or removes the video, the favorite still shows the old title; Open on YouTube shows its current state.
 - **Watched progress lives on one device** and is keyed by topic, so a new search for the same topic that returns different videos starts those videos unwatched.
 - **Some videos will not play inside the app.** Creators can turn off embedding; the player then shows YouTube's message and "Open on YouTube" is the way through.
 - **iPhone, portrait only.** No iPad layout yet.
-- **Not checked on a physical iPhone by the implementer.** The Release build compiles for devices and the flow passes in the Simulator; the device check above is manual.
+- **Device checks are manual.** The owner ran the first build on an iPhone 17 on 2026-10-24; the UI tests run in the Simulator.

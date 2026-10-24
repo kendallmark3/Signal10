@@ -9,11 +9,12 @@ struct PlayerSheet: View {
     let topic: String
     let path: [PathStep]
     @State var current: PathStep
+    @AppStorage(AppSettings.autoplayKey) private var autoplay = true
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                YouTubePlayer(videoID: current.video.id)
+                YouTubePlayer(videoID: current.video.id, autoplay: autoplay)
                     .aspectRatio(16 / 9, contentMode: .fit)
                     // A view, not a ShapeStyle, so the black stays out of the navigation bar.
                     .background { Color.black }
@@ -26,7 +27,15 @@ struct PlayerSheet: View {
             .navigationTitle("Step \(current.step) of \(path.count)")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } }
+                ToolbarItem(placement: .topBarLeading) {
+                    let favorite = app.isFavorite(current.video.id)
+                    Button { app.toggleFavorite(current.video, topic: topic) } label: {
+                        Image(systemName: favorite ? "star.fill" : "star")
+                    }
+                    .accessibilityLabel(favorite ? "Remove from favorites" : "Add to favorites")
+                    .accessibilityIdentifier("favoriteButton")
+                }
+                ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() }.accessibilityIdentifier("doneButton") }
             }
         }
     }
@@ -133,6 +142,7 @@ struct SignalBars: View {
 /// Links inside the player open in the YouTube app or Safari rather than inside Signal10.
 struct YouTubePlayer: UIViewRepresentable {
     let videoID: String
+    var autoplay = true
 
     // YouTube's embedded player requires a referrer identifying the app.
     private static let origin = URL(string: "https://\((Bundle.main.bundleIdentifier ?? "com.kendallsoft.Signal10").lowercased())")!
@@ -150,7 +160,7 @@ struct YouTubePlayer: UIViewRepresentable {
         view.scrollView.isScrollEnabled = false
         view.navigationDelegate = context.coordinator
         view.uiDelegate = context.coordinator
-        if let embed = YouTubeEmbed.url(videoID: videoID) {
+        if let embed = YouTubeEmbed.url(videoID: videoID, autoplay: autoplay) {
             view.loadHTMLString(Self.page(embed), baseURL: Self.origin)
         }
         return view

@@ -13,8 +13,10 @@ final class AppModel {
     private(set) var sessionGeneration = 0
 
     private let progress: LearningProgress
+    private let favoritesStore: FavoritesStore
     private let defaults: UserDefaults
     private var watchedRevision = 0
+    private var favoritesRevision = 0
     // Searches already fetched this launch, so moving back and forth costs the server nothing.
     // Pull to refresh asks again.
     private var cache: [String: Top10Response] = [:]
@@ -23,6 +25,7 @@ final class AppModel {
         self.client = client
         self.defaults = defaults
         self.progress = LearningProgress(defaults: defaults)
+        self.favoritesStore = FavoritesStore(defaults: defaults)
         self.recent = RecentSearches.load(from: defaults)
     }
 
@@ -68,5 +71,44 @@ final class AppModel {
 
     func watchedCount(in path: [PathStep], topic: String) -> Int {
         path.filter { isWatched($0.video.id, topic: topic) }.count
+    }
+
+    // MARK: Favorites
+
+    var favorites: [Favorite] {
+        _ = favoritesRevision
+        return favoritesStore.all
+    }
+
+    func isFavorite(_ videoID: String) -> Bool {
+        _ = favoritesRevision
+        return favoritesStore.isFavorite(videoID)
+    }
+
+    func toggleFavorite(_ video: Video, topic: String) {
+        favoritesStore.toggle(video, topic: topic)
+        favoritesRevision += 1
+    }
+
+    func removeFavorite(_ videoID: String) {
+        favoritesStore.remove(videoID)
+        favoritesRevision += 1
+    }
+
+    // MARK: Clearing data (Settings)
+
+    func clearRecent() {
+        RecentSearches.clear(in: defaults)
+        recent = []
+    }
+
+    func clearProgress() {
+        progress.clearAll()
+        watchedRevision += 1
+    }
+
+    func clearFavorites() {
+        favoritesStore.clear()
+        favoritesRevision += 1
     }
 }

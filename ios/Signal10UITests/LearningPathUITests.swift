@@ -19,29 +19,11 @@ final class LearningPathUITests: XCTestCase {
     }
 
     func testSearchWatchAndContinue() throws {
-        let topic = env["SIGNAL10_TOPIC"] ?? "AWS AgentCore"
         snapshot("01-home")
-
-        let field = app.textFields["topicField"]
-        XCTAssertTrue(field.waitForExistence(timeout: 10))
-        field.tap()
-        field.typeText(topic)
-        app.buttons["findButton"].tap()
-
-        // Signed out, so the server's sign-in appears first.
-        let username = app.textFields["username"]
-        XCTAssertTrue(username.waitForExistence(timeout: 30), "sign-in sheet")
-        username.tap()
-        username.typeText(env["SIGNAL10_USERNAME"]!)
-        let password = app.secureTextFields["password"]
-        password.tap()
-        password.typeText(env["SIGNAL10_PASSWORD"]!)
-        snapshot("02-sign-in")
-        app.buttons["signInButton"].tap()
+        try searchAndSignIn()
 
         // The Top 10 arrives and the path starts at step 1.
         let upNext = app.buttons["upNext"]
-        XCTAssertTrue(upNext.waitForExistence(timeout: 90), "results")
         XCTAssertTrue(upNext.label.contains("START HERE"), upNext.label)
         snapshot("03-results")
 
@@ -82,6 +64,72 @@ final class LearningPathUITests: XCTestCase {
         snapshot("09-architect")
     }
 
+    func testFavoritesSettingsAndHelp() throws {
+        try searchAndSignIn(snapshots: false)
+
+        // Star the first video from its player sheet.
+        app.buttons["upNext"].tap()
+        let star = app.buttons["favoriteButton"]
+        XCTAssertTrue(star.waitForExistence(timeout: 10), "player sheet")
+        XCTAssertEqual(star.label, "Add to favorites")
+        star.tap()
+        XCTAssertEqual(star.label, "Remove from favorites")
+        app.buttons["doneButton"].tap()
+
+        // Home now has Favorites, and the saved video plays from there.
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        let favoritesRow = app.buttons["favoritesRow"]
+        XCTAssertTrue(favoritesRow.waitForExistence(timeout: 10), "favorites row on Home")
+        snapshot("10-home-favorites")
+        favoritesRow.tap()
+        let saved = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'favorite-'")).firstMatch
+        XCTAssertTrue(saved.waitForExistence(timeout: 10), "a saved favorite")
+        snapshot("11-favorites")
+        saved.tap()
+        XCTAssertTrue(app.buttons["Remove from favorites"].waitForExistence(timeout: 10), "favorite player")
+        sleep(6)
+        snapshot("12-favorite-player")
+        app.buttons["doneButton"].tap()
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+
+        // Settings, then Help from Settings.
+        let gear = app.buttons["settingsButton"]
+        XCTAssertTrue(gear.waitForExistence(timeout: 10))
+        gear.tap()
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts[AppCredit.text].exists || app.buttons[AppCredit.text].exists, "credit in About")
+        snapshot("13-settings")
+        app.swipeUp()
+        snapshot("14-settings-about")
+        app.buttons["helpLink"].tap()
+        XCTAssertTrue(app.navigationBars["Help"].waitForExistence(timeout: 10))
+        snapshot("15-help")
+        app.swipeUp()
+        snapshot("16-help-signals")
+    }
+
+    /// Searches the topic from Home and signs in when the server asks, then waits for results.
+    private func searchAndSignIn(snapshots: Bool = true) throws {
+        let field = app.textFields["topicField"]
+        XCTAssertTrue(field.waitForExistence(timeout: 10))
+        field.tap()
+        field.typeText(env["SIGNAL10_TOPIC"] ?? "AWS AgentCore")
+        app.buttons["findButton"].tap()
+
+        // Signed out, so the server's sign-in appears first.
+        let username = app.textFields["username"]
+        XCTAssertTrue(username.waitForExistence(timeout: 30), "sign-in sheet")
+        username.tap()
+        username.typeText(env["SIGNAL10_USERNAME"]!)
+        let password = app.secureTextFields["password"]
+        password.tap()
+        password.typeText(env["SIGNAL10_PASSWORD"]!)
+        if snapshots { snapshot("02-sign-in") }
+        app.buttons["signInButton"].tap()
+
+        XCTAssertTrue(app.buttons["upNext"].waitForExistence(timeout: 90), "results")
+    }
+
     private func snapshot(_ name: String) {
         let shot = XCUIScreen.main.screenshot()
         let attachment = XCTAttachment(screenshot: shot)
@@ -92,4 +140,8 @@ final class LearningPathUITests: XCTestCase {
             try? shot.pngRepresentation.write(to: URL(fileURLWithPath: dir).appending(path: "\(name).png"))
         }
     }
+}
+
+private enum AppCredit {
+    static let text = "Developed by Mark Kendall at repogenic.com"
 }

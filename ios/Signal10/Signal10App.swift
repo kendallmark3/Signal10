@@ -27,19 +27,27 @@ struct Signal10App: App {
     }
 }
 
+enum Route: Hashable {
+    case results(String)
+    case favorites
+}
+
 struct RootView: View {
     @Environment(AppModel.self) private var app
-    @State private var path: [String] = []
+    @State private var path: [Route] = []
 
     var body: some View {
         @Bindable var app = app
         NavigationStack(path: $path) {
             HomeView { topic in
                 app.remember(topic)
-                path.append(topic)
+                path.append(.results(topic))
             }
-            .navigationDestination(for: String.self) { topic in
-                ResultsView(topic: topic)
+            .navigationDestination(for: Route.self) { route in
+                switch route {
+                case .results(let topic): ResultsView(topic: topic)
+                case .favorites: FavoritesView()
+                }
             }
         }
         .sheet(isPresented: $app.needsSignIn) {

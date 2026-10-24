@@ -6,6 +6,8 @@ struct HomeView: View {
 
     @State private var text = ""
     @FocusState private var focused: Bool
+    @State private var showSettings = false
+    @State private var showHelp = false
 
     private static let examples = [
         "AWS AgentCore", "Claude Code", "Swift concurrency",
@@ -56,6 +58,9 @@ struct HomeView: View {
                     .accessibilityIdentifier("findButton")
                 }
 
+                if !app.favorites.isEmpty {
+                    favoritesRow
+                }
                 if !app.recent.isEmpty {
                     topics("Recent", app.recent, icon: "clock.arrow.circlepath")
                 }
@@ -65,18 +70,44 @@ struct HomeView: View {
         }
         .scrollDismissesKeyboard(.interactively)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Menu {
-                    Text("Server: \(app.client.baseURL.host() ?? "")")
-                    Button("Sign out", systemImage: "rectangle.portrait.and.arrow.right") {
-                        Task { await app.signOut() }
-                    }
-                } label: {
-                    Image(systemName: "ellipsis.circle")
-                }
-                .accessibilityLabel("More")
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button { showHelp = true } label: { Image(systemName: "questionmark.circle") }
+                    .accessibilityLabel("Help")
+                Button { showSettings = true } label: { Image(systemName: "gearshape") }
+                    .accessibilityLabel("Settings")
+                    .accessibilityIdentifier("settingsButton")
             }
         }
+        .sheet(isPresented: $showSettings) { SettingsView() }
+        .sheet(isPresented: $showHelp) {
+            NavigationStack {
+                HelpView().toolbar {
+                    ToolbarItem(placement: .confirmationAction) { Button("Done") { showHelp = false } }
+                }
+            }
+        }
+    }
+
+    private var favoritesRow: some View {
+        NavigationLink(value: Route.favorites) {
+            HStack(spacing: 12) {
+                Image(systemName: "star.fill")
+                    .foregroundStyle(.white)
+                    .frame(width: 34, height: 34)
+                    .background(Color.brand, in: RoundedRectangle(cornerRadius: 8))
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Favorites").font(.headline).foregroundStyle(.primary)
+                    Text(app.favorites.count == 1 ? "1 saved video" : "\(app.favorites.count) saved videos")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                Spacer()
+                Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
+            }
+            .padding(12)
+            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 14))
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("favoritesRow")
     }
 
     private func topics(_ title: String, _ list: [String], icon: String) -> some View {

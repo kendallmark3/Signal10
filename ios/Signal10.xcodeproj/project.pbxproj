@@ -11,15 +11,18 @@
 		2EFCF39D1A84EB8AA5F58639 /* Signal10Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FFF37F79B8E58426A92468E /* Signal10Tests.swift */; };
 		36FD172BCC22294C49880AA8 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEA60B69F460E07CC729B17 /* SignInView.swift */; };
 		3DEDA152E1589FFA2748859D /* Learning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4830CD7CB309626BD1E60F29 /* Learning.swift */; };
+		41D193465F5F6F3604B6534A /* FavoritesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3750713A49B7D3B02663CD50 /* FavoritesView.swift */; };
 		737D53016AAD3F3DF86BE78A /* LearningPathUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8793BA879EFB4F0373FD4A /* LearningPathUITests.swift */; };
 		74AD853B7B46699E8A89A6B0 /* ArchitectSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEE822CE35E07575F9D5358 /* ArchitectSheet.swift */; };
 		76735752192D5913E6E1F05D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E55C29464BE0D14B95938201 /* Assets.xcassets */; };
+		7FF0EDE9ACCD288CAEB4F1FE /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4E4A754BB6BEF72F7C70B77 /* Preferences.swift */; };
 		8616FC1E93616389D64994C4 /* Fixtures in Resources */ = {isa = PBXBuildFile; fileRef = 51153F09D2DC703A67127DD7 /* Fixtures */; };
 		88A3AD55D9364C90B1F50987 /* Signal10App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31196F5F6B631194D2675B1E /* Signal10App.swift */; };
 		A460E7FE2AB2892922742A3A /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE9FF87676F3F09EF3671F6 /* Models.swift */; };
 		A4DB0ED42B1F9450FEE6A18A /* PlayerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23C05B8CFF2982BB0E471D53 /* PlayerSheet.swift */; };
 		B5DAB9021921CEF5B72E9A7D /* Signal10Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE48EC33D2C04ECE7DE32EED /* Signal10Client.swift */; };
 		BA7F73CF01FB81FD64689A3C /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 402E3C18D195E54B06034432 /* Theme.swift */; };
+		DBE239EF5458CA0B5C129970 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 819BA61E829A8D94790A169D /* SettingsView.swift */; };
 		DE3A62F449BD3CA1105A239B /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E4590C5E9610A8F87246930 /* HomeView.swift */; };
 		EFB61D3A2FD40F24AC13C1B3 /* ResultsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C67F408C70731BD843632119 /* ResultsView.swift */; };
 		FB10F9E7F15CCC5B1598F2E5 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4FA7BEB2D64B1E4BB7D8E3D4 /* AppModel.swift */; };
@@ -46,6 +49,7 @@
 		2166022AC507DC7F18061E57 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		23C05B8CFF2982BB0E471D53 /* PlayerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerSheet.swift; sourceTree = "<group>"; };
 		31196F5F6B631194D2675B1E /* Signal10App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signal10App.swift; sourceTree = "<group>"; };
+		3750713A49B7D3B02663CD50 /* FavoritesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesView.swift; sourceTree = "<group>"; };
 		402E3C18D195E54B06034432 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		4830CD7CB309626BD1E60F29 /* Learning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Learning.swift; sourceTree = "<group>"; };
 		4FA7BEB2D64B1E4BB7D8E3D4 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
@@ -54,9 +58,11 @@
 		6EBDBC4B6277ECAB1E05C56A /* Signal10UITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = Signal10UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7171552F26A84035D7C99C5A /* Signal10.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Signal10.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B8793BA879EFB4F0373FD4A /* LearningPathUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningPathUITests.swift; sourceTree = "<group>"; };
+		819BA61E829A8D94790A169D /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		8BEA60B69F460E07CC729B17 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		8E4590C5E9610A8F87246930 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		8FFF37F79B8E58426A92468E /* Signal10Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signal10Tests.swift; sourceTree = "<group>"; };
+		B4E4A754BB6BEF72F7C70B77 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		BBE9FF87676F3F09EF3671F6 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 		BD4E76322E9B1C795C9F028D /* Signal10Tests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = Signal10Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE48EC33D2C04ECE7DE32EED /* Signal10Client.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signal10Client.swift; sourceTree = "<group>"; };
@@ -103,9 +109,11 @@
 			isa = PBXGroup;
 			children = (
 				DCEE822CE35E07575F9D5358 /* ArchitectSheet.swift */,
+				3750713A49B7D3B02663CD50 /* FavoritesView.swift */,
 				8E4590C5E9610A8F87246930 /* HomeView.swift */,
 				23C05B8CFF2982BB0E471D53 /* PlayerSheet.swift */,
 				C67F408C70731BD843632119 /* ResultsView.swift */,
+				819BA61E829A8D94790A169D /* SettingsView.swift */,
 				8BEA60B69F460E07CC729B17 /* SignInView.swift */,
 				402E3C18D195E54B06034432 /* Theme.swift */,
 			);
@@ -145,6 +153,7 @@
 			children = (
 				4830CD7CB309626BD1E60F29 /* Learning.swift */,
 				BBE9FF87676F3F09EF3671F6 /* Models.swift */,
+				B4E4A754BB6BEF72F7C70B77 /* Preferences.swift */,
 				BE48EC33D2C04ECE7DE32EED /* Signal10Client.swift */,
 			);
 			path = Core;
@@ -297,11 +306,14 @@
 			files = (
 				FB10F9E7F15CCC5B1598F2E5 /* AppModel.swift in Sources */,
 				74AD853B7B46699E8A89A6B0 /* ArchitectSheet.swift in Sources */,
+				41D193465F5F6F3604B6534A /* FavoritesView.swift in Sources */,
 				DE3A62F449BD3CA1105A239B /* HomeView.swift in Sources */,
 				3DEDA152E1589FFA2748859D /* Learning.swift in Sources */,
 				A460E7FE2AB2892922742A3A /* Models.swift in Sources */,
 				A4DB0ED42B1F9450FEE6A18A /* PlayerSheet.swift in Sources */,
+				7FF0EDE9ACCD288CAEB4F1FE /* Preferences.swift in Sources */,
 				EFB61D3A2FD40F24AC13C1B3 /* ResultsView.swift in Sources */,
+				DBE239EF5458CA0B5C129970 /* SettingsView.swift in Sources */,
 				36FD172BCC22294C49880AA8 /* SignInView.swift in Sources */,
 				88A3AD55D9364C90B1F50987 /* Signal10App.swift in Sources */,
 				B5DAB9021921CEF5B72E9A7D /* Signal10Client.swift in Sources */,
