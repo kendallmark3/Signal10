@@ -79,6 +79,8 @@ struct ArchitectSheet: View {
                     .font(.caption).foregroundStyle(.secondary)
             }
         }
+        .scrollIndicators(.visible)
+        .scrollIndicatorsFlash(onAppear: true)
     }
 
     @ViewBuilder private func stepRow(_ number: Int, _ step: ArchitectStep) -> some View {

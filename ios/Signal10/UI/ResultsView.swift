@@ -110,6 +110,8 @@ struct ResultsView: View {
             .padding(.bottom, 24)
             .accessibilityIdentifier("results")
         }
+        .scrollIndicators(.visible)
+        .scrollIndicatorsFlash(onAppear: true)
         .refreshable { await load(refresh: true) }
     }
 
