@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Case Study: Signal10 for iPhone | Repogenic</title>
+<meta name="description" content="How Repogenic turned a working web app into a tested, native iPhone app by reusing its existing intelligence instead of rebuilding it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fbfcff;
+    --surface: #ffffff;
+    --soft: #f0f4fd;
+    --ink: #0f1b3d;
+    --navy: #0b1530;
+    --muted: #55607d;
+    --line: #e3e8f5;
+    --cyan: #14d4f0;
+    --blue: #2563eb;
+    --violet: #7c3aed;
+    --gradient: linear-gradient(120deg, var(--cyan) 0%, var(--blue) 52%, var(--violet) 100%);
+    --radius: 20px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 400 17px/1.65 "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  img { max-width: 100%; height: auto; display: block; }
+  a { color: var(--blue); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--blue); background: var(--soft); border-radius: 999px; padding: 6px 14px;
+  }
+  .gradient-text { background: var(--gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  h1, h2, h3 { line-height: 1.15; margin: 0; letter-spacing: -0.02em; }
+  h1 { font-size: clamp(36px, 6vw, 60px); font-weight: 800; }
+  h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 800; }
+  h3 { font-size: 20px; font-weight: 700; }
+  p { margin: 0; }
+  section { padding: 72px 0; }
+  .lead { font-size: clamp(18px, 2.2vw, 21px); color: var(--muted); max-width: 720px; }
+
+  /* Hero */
+  .hero { padding: 72px 0 56px; background: radial-gradient(1200px 500px at 85% -10%, rgba(124, 58, 237, .10), transparent 60%), radial-gradient(900px 500px at -10% 0%, rgba(20, 212, 240, .10), transparent 60%); }
+  .hero-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 48px; align-items: center; }
+  .hero h1 { margin: 18px 0 18px; }
+  .hero .meta { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 26px; color: var(--muted); font-size: 15px; }
+  .hero .meta b { color: var(--ink); }
+  .phone {
+    justify-self: center; width: min(300px, 100%); border-radius: 44px; padding: 10px;
+    background: var(--navy); box-shadow: 0 30px 80px rgba(15, 27, 61, .25);
+  }
+  .phone img { border-radius: 34px; }
+
+  /* Stats */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: -8px; }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 22px 20px; }
+  .stat .num { font-size: 34px; font-weight: 800; line-height: 1.1; }
+  .stat .label { color: var(--muted); font-size: 14.5px; margin-top: 6px; }
+
+  /* Two-column content */
+  .split { display: grid; grid-template-columns: .9fr 1.1fr; gap: 56px; align-items: start; }
+  .split h2 { margin-top: 14px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; }
+  .quote { border-left: 4px solid; border-image: var(--gradient) 1; padding: 4px 0 4px 20px; font-size: 19px; font-weight: 500; }
+  ul.checks { list-style: none; padding: 0; margin: 18px 0 0; display: grid; gap: 12px; }
+  ul.checks li { position: relative; padding-left: 32px; }
+  ul.checks li::before {
+    content: ""; position: absolute; left: 0; top: 4px; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--gradient);
+  }
+  ul.checks li::after {
+    content: ""; position: absolute; left: 7px; top: 8px; width: 5px; height: 9px;
+    border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg);
+  }
+
+  /* Loop */
+  .band { background: var(--navy); color: #e8edfb; }
+  .band .lead { color: #aab4d4; }
+  .band .eyebrow { background: rgba(255, 255, 255, .08); color: #8fd8ff; }
+  .loop { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-top: 40px; counter-reset: step; }
+  .loop .step { background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .10); border-radius: var(--radius); padding: 22px 20px; }
+  .loop .step::before {
+    counter-increment: step; content: counter(step);
+    display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%;
+    background: var(--gradient); color: #fff; font-weight: 800; font-size: 15px; margin-bottom: 14px;
+  }
+  .loop h3 { color: #fff; font-size: 18px; margin-bottom: 8px; }
+  .loop p { font-size: 15px; color: #b8c2e0; }
+
+  /* Gallery */
+  .gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; margin-top: 40px; }
+  .gallery figure { margin: 0; }
+  .gallery .shot { border-radius: 26px; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 14px 40px rgba(15, 27, 61, .10); background: #fff; }
+  .gallery figcaption { margin-top: 12px; font-size: 14.5px; color: var(--muted); }
+  .gallery figcaption b { display: block; color: var(--ink); font-size: 15.5px; }
+
+  /* Evidence table */
+  .evidence { width: 100%; border-collapse: collapse; margin-top: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+  .evidence th, .evidence td { text-align: left; padding: 16px 20px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .evidence th { width: 34%; font-weight: 700; }
+  .evidence td { color: var(--muted); }
+  .evidence tr:last-child th, .evidence tr:last-child td { border-bottom: 0; }
+
+  /* Why it matters */
+  .why { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 36px; }
+  .why .card h3 { margin-bottom: 10px; }
+  .why .card p { color: var(--muted); font-size: 16px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+  .chips span { background: var(--soft); border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; font-size: 14.5px; font-weight: 600; }
+
+  /* CTA */
+  .cta { text-align: center; }
+  .cta .card { padding: 56px 28px; background: radial-gradient(800px 300px at 50% 0%, rgba(37, 99, 235, .08), transparent 70%), var(--surface); }
+  .cta .lead { margin: 16px auto 28px; }
+  .button {
+    display: inline-block; background: var(--gradient); color: #fff; text-decoration: none;
+    font-weight: 700; padding: 15px 28px; border-radius: 999px; box-shadow: 0 10px 30px rgba(37, 99, 235, .30);
+  }
+
+  @media (max-width: 900px) {
+    .hero-grid, .split { grid-template-columns: 1fr; gap: 36px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .loop { grid-template-columns: 1fr; }
+    .gallery { grid-template-columns: repeat(2, 1fr); }
+    .why { grid-template-columns: 1fr; }
+    section { padding: 56px 0; }
+  }
+  @media (max-width: 520px) {
+    .wrap { padding: 0 16px; }
+    .stats { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .stat { padding: 18px 16px; }
+    .stat .num { font-size: 28px; }
+    .gallery { gap: 14px; }
+    .evidence th, .evidence td { display: block; width: 100%; padding: 12px 16px; }
+    .evidence th { border-bottom: 0; padding-bottom: 0; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">Case study · iOS</span>
+        <h1>Signal10: from web app to <span class="gradient-text">native iPhone app</span></h1>
+        <p class="lead">A working learning-discovery product became a tested, native iPhone app built on its existing intelligence, not a second copy of it.</p>
+        <div class="meta">
+          <span><b>Platform</b> iPhone, iOS 18+</span>
+          <span><b>Stack</b> SwiftUI on an existing Node.js service</span>
+          <span><b>Method</b> RepoGenics</span>
+        </div>
+      </div>
+      <div class="phone"><img src="images/results.jpg" alt="Signal10 results screen showing a Start here card and the learning path" width="900" height="1957"></div>
+    </div>
+  </header>
+
+  <!-- Stats -->
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat"><div class="num gradient-text">1 day</div><div class="label">From the brief to a tested app running on a real iPhone</div></div>
+      <div class="stat"><div class="num gradient-text">18</div><div class="label">Written success criteria, each one tested</div></div>
+      <div class="stat"><div class="num gradient-text">0</div><div class="label">Lines of server code changed to support the app</div></div>
+      <div class="stat"><div class="num gradient-text">0</div><div class="label">API keys or secrets inside the iPhone app</div></div>
+    </div>
+  </div>
+
+  <!-- The request -->
+  <section>
+    <div class="wrap split">
+      <div>
+        <span class="eyebrow">The request</span>
+        <h2>"Make it feel built for iPhone, without reinventing it."</h2>
+      </div>
+      <div class="card">
+        <p class="quote">YouTube has the knowledge. Signal10 gives you the path.</p>
+        <p style="margin-top:18px">Signal10 answers one question: <em>what are the best videos to watch to learn this subject?</em> It searches YouTube, cuts the noise and duplicates, ranks on more than view counts, and turns the best ten into a learning path. It already worked as a web app.</p>
+        <p style="margin-top:14px">The brief was to make it a production-quality native iPhone app, with firm boundaries:</p>
+        <ul class="checks">
+          <li>Treat the existing product as the source of truth: same ranking, reasons, learning path and backend.</li>
+          <li>Never ship an API key or model secret inside the app.</li>
+          <li>Keep the AI provider replaceable, so the app never depends on one model vendor.</li>
+          <li>Keep it simple: one question, "What do you want to learn?", and an obvious next video.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- How: the Repogenic Loop -->
+  <section class="band">
+    <div class="wrap">
+      <span class="eyebrow">How it was delivered</span>
+      <h2 style="margin-top:14px">The Repogenic Loop, applied to one app</h2>
+      <p class="lead" style="margin-top:14px">Every step left evidence in the repository, so the speed came with proof.</p>
+      <div class="loop">
+        <div class="step">
+          <h3>Intent</h3>
+          <p>The brief became a one-page intent with 10 numbered, testable success criteria, written after reading the whole existing repository first.</p>
+        </div>
+        <div class="step">
+          <h3>Variation</h3>
+          <p>AI-assisted engineering produced the SwiftUI client, its models and its tests, reusing the existing service's API instead of rebuilding its logic.</p>
+        </div>
+        <div class="step">
+          <h3>Selection</h3>
+          <p>Failing tests were committed first, then code until they passed, then real searches and an automated walkthrough on a simulated iPhone.</p>
+        </div>
+        <div class="step">
+          <h3>Inheritance</h3>
+          <p>Each success merged with its evidence: screenshots, a build-and-run guide, and notes so the next feature starts from what works.</p>
+        </div>
+        <div class="step">
+          <h3>Guardrails</h3>
+          <p>Secret scanning, a no-keys-in-the-app test, untrusted YouTube text rendered as plain text, and the AI boundary kept on the server.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What was delivered -->
+  <section>
+    <div class="wrap">
+      <span class="eyebrow">The output</span>
+      <h2 style="margin-top:14px">A learning path you can work through</h2>
+      <p class="lead" style="margin-top:14px">Type a topic, start watching. The app remembers where you are, so coming back always shows what's next.</p>
+      <div class="gallery">
+        <figure><div class="shot"><img src="images/home.jpg" alt="Home screen asking What do you want to learn?" loading="lazy" width="900" height="1957"></div><figcaption><b>One question</b>No account and no YouTube sign-in. Recent searches and examples one tap away.</figcaption></figure>
+        <figure><div class="shot"><img src="images/results.jpg" alt="Results with Start here and the learning path" loading="lazy" width="900" height="1957"></div><figcaption><b>A curated Top 10</b>Start here, then stages from foundation to practical, with a switch to the plain ranking.</figcaption></figure>
+        <figure><div class="shot"><img src="images/player.jpg" alt="Video playing with Why Signal10 picked it" loading="lazy" width="900" height="1957"></div><figcaption><b>Watch and understand</b>Plays in YouTube's own player, with the reason and five ranking signals behind each pick.</figcaption></figure>
+        <figure><div class="shot"><img src="images/up-next.jpg" alt="Up next moved to step 2 with progress shown" loading="lazy" width="900" height="1957"></div><figcaption><b>Pick up where you left off</b>Mark watched, play next. Progress and Up next are remembered on the phone.</figcaption></figure>
+        <figure><div class="shot"><img src="images/favorites.jpg" alt="Home screen with Favorites" loading="lazy" width="900" height="1957"></div><figcaption><b>Favorites</b>Star the videos worth keeping and replay them from Home.</figcaption></figure>
+        <figure><div class="shot"><img src="images/settings.jpg" alt="Settings screen" loading="lazy" width="900" height="1957"></div><figcaption><b>Settings</b>Start view, autoplay, clearing your data, account and about.</figcaption></figure>
+        <figure><div class="shot"><img src="images/help.jpg" alt="Help screen" loading="lazy" width="900" height="1957"></div><figcaption><b>Help and how-to</b>Plain-language steps, and how videos are actually picked.</figcaption></figure>
+        <figure style="align-self:center"><div class="card" style="text-align:center"><img src="images/app-icon.png" alt="Signal10 app icon" width="96" height="96" style="margin:0 auto 14px;border-radius:22px;border:1px solid var(--line)"><b>Signal10</b><p style="color:var(--muted);font-size:14.5px;margin-top:4px">App icon and wordmark carried over from the existing brand.</p></div></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- Evidence -->
+  <section style="padding-top:0">
+    <div class="wrap">
+      <span class="eyebrow">The evidence</span>
+      <h2 style="margin-top:14px">Proven, not just demoed</h2>
+      <table class="evidence">
+        <tr><th>Tests written before the code</th><td>Each feature began with a commit holding only failing tests and the written intent. The git history shows the tests came first.</td></tr>
+        <tr><th>30 unit tests, 2 end-to-end tests</th><td>Decoding real server replies, sign-in, error handling, progress, favorites, settings and player safety. End-to-end tests sign in, search, play, mark watched, continue the path, save a favorite, and open Settings and Help, with a screenshot at each step.</td></tr>
+        <tr><th>Existing product unchanged</th><td>All 79 existing service tests still pass. The web app and its live deployment were left untouched.</td></tr>
+        <tr><th>No secrets in the app</th><td>The built app was scanned for keys and credentials, with no matches. A test fails the build if a key ever appears in the app's settings.</td></tr>
+        <tr><th>Running on real hardware</th><td>Signed, installed and used on an iPhone 17. Feedback from the device turned into two quick, tested layout improvements.</td></tr>
+        <tr><th>Second feature, same discipline</th><td>Settings, Help and Favorites went through the same loop: an 8-criterion intent, failing tests, code, live end-to-end proof.</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- Why it matters -->
+  <section style="padding-top:0">
+    <div class="wrap">
+      <span class="eyebrow">Why it matters</span>
+      <h2 style="margin-top:14px">Speed is only valuable with proof</h2>
+      <div class="why">
+        <div class="card">
+          <h3>Reuse, not rewrite</h3>
+          <p>The iPhone app consumes the product's existing intelligence. One source of truth for ranking and AI behaviour means one place to improve it, and nothing drifts between web and phone.</p>
+        </div>
+        <div class="card">
+          <h3>Safe by design</h3>
+          <p>Secrets stay on the server. The AI provider sits behind the service boundary, so it can move between model vendors, or route by cost, without an app update.</p>
+        </div>
+        <div class="card">
+          <h3>Evidence a buyer can check</h3>
+          <p>Intent, failing tests, passing tests, screenshots and device builds are all in the repository. That is the RepoGenics difference: faster delivery that holds up to scrutiny.</p>
+        </div>
+      </div>
+      <div class="chips" aria-label="Technology">
+        <span>SwiftUI</span><span>Swift 6</span><span>Swift Testing</span><span>XCUITest</span><span>Xcode</span><span>Node.js service</span><span>AWS Lambda</span><span>YouTube embedded player</span><span>Intent-driven engineering</span><span>AI-assisted TDD</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" style="padding-top:0">
+    <div class="wrap">
+      <div class="card">
+        <h2>Have an idea for an <span class="gradient-text">iPhone app</span>?</h2>
+        <p class="lead">From intent to a tested app on your own phone, then on to App Store submission in about five days, with the evidence to show for every step.</p>
+        <a class="button" href="https://www.repogenic.com/#contact">Talk to Repogenic</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>
