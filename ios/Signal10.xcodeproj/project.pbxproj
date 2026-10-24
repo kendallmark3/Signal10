@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		11A42A72999F30E252D7A56D /* SettingsFavoritesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51D5440E807802A395B03EAA /* SettingsFavoritesTests.swift */; };
 		2EFCF39D1A84EB8AA5F58639 /* Signal10Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FFF37F79B8E58426A92468E /* Signal10Tests.swift */; };
 		36FD172BCC22294C49880AA8 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BEA60B69F460E07CC729B17 /* SignInView.swift */; };
 		3DEDA152E1589FFA2748859D /* Learning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4830CD7CB309626BD1E60F29 /* Learning.swift */; };
@@ -49,6 +50,7 @@
 		4830CD7CB309626BD1E60F29 /* Learning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Learning.swift; sourceTree = "<group>"; };
 		4FA7BEB2D64B1E4BB7D8E3D4 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		51153F09D2DC703A67127DD7 /* Fixtures */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Fixtures; path = Signal10Tests/Fixtures; sourceTree = SOURCE_ROOT; };
+		51D5440E807802A395B03EAA /* SettingsFavoritesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsFavoritesTests.swift; sourceTree = "<group>"; };
 		6EBDBC4B6277ECAB1E05C56A /* Signal10UITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = Signal10UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7171552F26A84035D7C99C5A /* Signal10.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Signal10.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7B8793BA879EFB4F0373FD4A /* LearningPathUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningPathUITests.swift; sourceTree = "<group>"; };
@@ -91,6 +93,7 @@
 			isa = PBXGroup;
 			children = (
 				51153F09D2DC703A67127DD7 /* Fixtures */,
+				51D5440E807802A395B03EAA /* SettingsFavoritesTests.swift */,
 				8FFF37F79B8E58426A92468E /* Signal10Tests.swift */,
 			);
 			path = Signal10Tests;
@@ -310,6 +313,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				11A42A72999F30E252D7A56D /* SettingsFavoritesTests.swift in Sources */,
 				2EFCF39D1A84EB8AA5F58639 /* Signal10Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
