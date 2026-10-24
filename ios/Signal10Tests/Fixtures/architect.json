@@ -1,0 +1,16 @@
+{
+ "topic": "Swift concurrency",
+ "view": {
+  "summary": "Start with Apple's own overview, then practise.",
+  "sequence": [
+   { "video": { "rank": 1, "id": "E95agtPgaa0", "title": "Q&A: Swift concurrency | Meet with Apple", "channel": "Apple Developer", "durationText": "1:03:49", "url": "https://www.youtube.com/watch?v=E95agtPgaa0" }, "why": "The authoritative overview." },
+   { "reading": { "number": 1, "title": "Python", "authors": null, "year": null, "access": "borrowable", "accessLabel": "Free to borrow with an Open Library account", "url": "https://openlibrary.org/works/OL123W" }, "why": "Background reading." }
+  ],
+  "prerequisites": ["Swift closures"],
+  "skip": [],
+  "keyConcepts": ["async/await", "actors"],
+  "architectureImplications": ["Isolate shared state in actors."],
+  "risks": ["Data races in legacy code."],
+  "nextStep": "Migrate one module to strict concurrency."
+ }
+}

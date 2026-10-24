@@ -1,0 +1,5 @@
+// The Signal10 server the app talks to. Only the address lives here: credentials stay on the server.
+// The Simulator reaches the Mac's localhost directly. A real iPhone cannot, so build Release
+// (or change this line) to run on a device. `//` starts a comment in xcconfig, hence $(SLASH).
+SLASH = /
+SIGNAL10_BASE_URL = http:$(SLASH)$(SLASH)localhost:4310

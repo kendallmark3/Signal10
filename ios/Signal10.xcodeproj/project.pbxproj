@@ -1,0 +1,442 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2EFCF39D1A84EB8AA5F58639 /* Signal10Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FFF37F79B8E58426A92468E /* Signal10Tests.swift */; };
+		76735752192D5913E6E1F05D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E55C29464BE0D14B95938201 /* Assets.xcassets */; };
+		8616FC1E93616389D64994C4 /* Fixtures in Resources */ = {isa = PBXBuildFile; fileRef = 51153F09D2DC703A67127DD7 /* Fixtures */; };
+		88A3AD55D9364C90B1F50987 /* Signal10App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31196F5F6B631194D2675B1E /* Signal10App.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		787EDF8E54429F311A8866B5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A5E20E9B1A7E7DB9817B71A5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 78EF52BAE2710275AB87695C;
+			remoteInfo = Signal10;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		2166022AC507DC7F18061E57 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		31196F5F6B631194D2675B1E /* Signal10App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signal10App.swift; sourceTree = "<group>"; };
+		51153F09D2DC703A67127DD7 /* Fixtures */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Fixtures; path = Signal10Tests/Fixtures; sourceTree = SOURCE_ROOT; };
+		7171552F26A84035D7C99C5A /* Signal10.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Signal10.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8FFF37F79B8E58426A92468E /* Signal10Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Signal10Tests.swift; sourceTree = "<group>"; };
+		BD4E76322E9B1C795C9F028D /* Signal10Tests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = Signal10Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D896725C313C73E79BDA01CB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		E03BEDB5A886AB384FC85B29 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		E55C29464BE0D14B95938201 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		31A1B991ADFB0A38C75F2B91 /* Signal10 */ = {
+			isa = PBXGroup;
+			children = (
+				E55C29464BE0D14B95938201 /* Assets.xcassets */,
+				D896725C313C73E79BDA01CB /* Info.plist */,
+				31196F5F6B631194D2675B1E /* Signal10App.swift */,
+			);
+			path = Signal10;
+			sourceTree = "<group>";
+		};
+		394B113C392D774BD476EDAD /* Signal10Tests */ = {
+			isa = PBXGroup;
+			children = (
+				51153F09D2DC703A67127DD7 /* Fixtures */,
+				8FFF37F79B8E58426A92468E /* Signal10Tests.swift */,
+			);
+			path = Signal10Tests;
+			sourceTree = "<group>";
+		};
+		C23DE2FD8DD89B467F38AC08 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				E03BEDB5A886AB384FC85B29 /* Debug.xcconfig */,
+				2166022AC507DC7F18061E57 /* Release.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		CC1529D6976C5C1D95D22FE8 = {
+			isa = PBXGroup;
+			children = (
+				C23DE2FD8DD89B467F38AC08 /* Config */,
+				31A1B991ADFB0A38C75F2B91 /* Signal10 */,
+				394B113C392D774BD476EDAD /* Signal10Tests */,
+				F970D3BEE4D12B1C1806811A /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F970D3BEE4D12B1C1806811A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7171552F26A84035D7C99C5A /* Signal10.app */,
+				BD4E76322E9B1C795C9F028D /* Signal10Tests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		78B6FCC370A8808DB2E38B2C /* Signal10Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1CB2211356478F0A6585D5CC /* Build configuration list for PBXNativeTarget "Signal10Tests" */;
+			buildPhases = (
+				DE4D2BB8F3185882061B7A1C /* Sources */,
+				A7E06D28F37E0D5C58F40A68 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FABD99EF93F2AE9799AD7A78 /* PBXTargetDependency */,
+			);
+			name = Signal10Tests;
+			packageProductDependencies = (
+			);
+			productName = Signal10Tests;
+			productReference = BD4E76322E9B1C795C9F028D /* Signal10Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		78EF52BAE2710275AB87695C /* Signal10 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D765591E7286436A31E2F11B /* Build configuration list for PBXNativeTarget "Signal10" */;
+			buildPhases = (
+				4FF33A99A8F25EA1B1DD9863 /* Sources */,
+				029ECB12090EFAE066298F86 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Signal10;
+			packageProductDependencies = (
+			);
+			productName = Signal10;
+			productReference = 7171552F26A84035D7C99C5A /* Signal10.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A5E20E9B1A7E7DB9817B71A5 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					78B6FCC370A8808DB2E38B2C = {
+						DevelopmentTeam = 3MA883Y6R4;
+						ProvisioningStyle = Automatic;
+					};
+					78EF52BAE2710275AB87695C = {
+						DevelopmentTeam = 3MA883Y6R4;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 02960A043520664DBE35743D /* Build configuration list for PBXProject "Signal10" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = CC1529D6976C5C1D95D22FE8;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = F970D3BEE4D12B1C1806811A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				78EF52BAE2710275AB87695C /* Signal10 */,
+				78B6FCC370A8808DB2E38B2C /* Signal10Tests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		029ECB12090EFAE066298F86 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				76735752192D5913E6E1F05D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A7E06D28F37E0D5C58F40A68 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8616FC1E93616389D64994C4 /* Fixtures in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4FF33A99A8F25EA1B1DD9863 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				88A3AD55D9364C90B1F50987 /* Signal10App.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DE4D2BB8F3185882061B7A1C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2EFCF39D1A84EB8AA5F58639 /* Signal10Tests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FABD99EF93F2AE9799AD7A78 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 78EF52BAE2710275AB87695C /* Signal10 */;
+			targetProxy = 787EDF8E54429F311A8866B5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		4D9675E7365C443B23214286 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E03BEDB5A886AB384FC85B29 /* Debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Signal10/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kendallsoft.Signal10;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		61F6C874449F06FC659C24F4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 3MA883Y6R4;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		82F84BC69F69B6081AF3AE7B /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2166022AC507DC7F18061E57 /* Release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Signal10/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kendallsoft.Signal10;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		D3A08FEE445E4F480693941F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kendallsoft.Signal10Tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Signal10.app/Signal10";
+			};
+			name = Release;
+		};
+		D6A201C89CF702FC0B2468E4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.kendallsoft.Signal10Tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Signal10.app/Signal10";
+			};
+			name = Debug;
+		};
+		EFDB85CAA63C495481B071F7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 3MA883Y6R4;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		02960A043520664DBE35743D /* Build configuration list for PBXProject "Signal10" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				EFDB85CAA63C495481B071F7 /* Debug */,
+				61F6C874449F06FC659C24F4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		1CB2211356478F0A6585D5CC /* Build configuration list for PBXNativeTarget "Signal10Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D6A201C89CF702FC0B2468E4 /* Debug */,
+				D3A08FEE445E4F480693941F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D765591E7286436A31E2F11B /* Build configuration list for PBXNativeTarget "Signal10" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4D9675E7365C443B23214286 /* Debug */,
+				82F84BC69F69B6081AF3AE7B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A5E20E9B1A7E7DB9817B71A5 /* Project object */;
+}

@@ -1,0 +1,4 @@
+// The deployed Signal10 server (AWS Lambda Function URL from `npm run deploy:aws`).
+// Only the address lives here: credentials stay on the server.
+SLASH = /
+SIGNAL10_BASE_URL = https:$(SLASH)$(SLASH)bn3mc35kzeldwm5k3zz52butyy0weyqu.lambda-url.us-east-2.on.aws
