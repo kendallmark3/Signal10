@@ -132,31 +132,36 @@ struct ResultsView: View {
     @ViewBuilder private func upNext(_ reply: Top10Response) -> some View {
         if let next = app.upNext(in: reply.learningPath, topic: reply.topic) {
             Button { playing = next } label: {
-                VStack(alignment: .leading, spacing: 10) {
-                    Thumbnail(url: next.video.thumbnail, duration: next.video.durationText, cornerRadius: 14)
+                // Compact, so the path itself starts on the first screen.
+                HStack(alignment: .top, spacing: 12) {
+                    Thumbnail(url: next.video.thumbnail, duration: next.video.durationText)
+                        .frame(width: 140)
                         .overlay {
                             Image(systemName: "play.circle.fill")
-                                .font(.system(size: 54))
+                                .font(.system(size: 34))
                                 .symbolRenderingMode(.palette)
                                 .foregroundStyle(.white, .black.opacity(0.45))
                         }
-                    Text(next.step == 1 && app.watchedCount(in: reply.learningPath, topic: reply.topic) == 0
-                         ? "START HERE" : "UP NEXT · STEP \(next.step) OF \(reply.learningPath.count)")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(Color.brand)
-                    Text(next.video.title)
-                        .font(.title3.weight(.semibold))
-                        .foregroundStyle(.primary)
-                        .multilineTextAlignment(.leading)
-                    Text(metadata(next.video))
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    Text(next.pathReason)
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.leading)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(next.step == 1 && app.watchedCount(in: reply.learningPath, topic: reply.topic) == 0
+                             ? "START HERE" : "UP NEXT · STEP \(next.step) OF \(reply.learningPath.count)")
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(Color.brand)
+                        Text(next.video.title)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.primary)
+                            .lineLimit(3)
+                            .multilineTextAlignment(.leading)
+                        Text(next.video.channel)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
                 }
+                .padding(12)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.brand.opacity(0.08), in: RoundedRectangle(cornerRadius: 14))
+                .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Color.brand.opacity(0.25)))
             }
             .buttonStyle(.plain)
             .accessibilityHint("Plays the next video in your path")
